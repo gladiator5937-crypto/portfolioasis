@@ -8,26 +8,13 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Premium Animations */
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
         }
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.1); }
-            50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.3); }
-        }
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-        @keyframes rotate-gradient {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
         @keyframes popIn {
             0% { transform: scale(0) rotate(-10deg); opacity: 0; }
@@ -37,36 +24,11 @@
         
         .animate-float { animation: float 3s ease-in-out infinite; }
         .animate-slide-in { animation: slideIn 0.5s ease-out forwards; }
-        .animate-shimmer {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite;
-        }
         
         .glass-card {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .gradient-border {
-            position: relative;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
-            padding: 2px;
-            border-radius: 1.5rem;
-        }
-        
-        .gradient-border > * {
-            background: white;
-            border-radius: 1.5rem;
-        }
-        
-        .hover-scale {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .hover-scale:hover {
-            transform: scale(1.02);
-            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.15);
         }
         
         .gradient-text {
@@ -76,8 +38,18 @@
             background-clip: text;
         }
         
-        .neon-glow {
-            box-shadow: 0 0 30px rgba(99, 102, 241, 0.2);
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #1d9bf0;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 3px 14px;
+            border-radius: 30px;
+            letter-spacing: 0.3px;
+            animation: popIn 0.5s ease-out;
         }
         
         .scrollbar-hide::-webkit-scrollbar {
@@ -95,55 +67,12 @@
             transform: translateY(-4px) scale(1.01);
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
         }
-        
-        .badge-pulse {
-            animation: pulse-glow 2s infinite;
-        }
-        
-        .verified-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #1d9bf0;
-            color: white;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 3px 14px;
-            border-radius: 30px;
-            letter-spacing: 0.3px;
-            animation: popIn 0.5s ease-out;
-        }
-        
-        .floating-particle {
-            position: fixed;
-            width: 6px;
-            height: 6px;
-            background: rgba(99, 102, 241, 0.1);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: float-particle 15s infinite linear;
-        }
-        
-        @keyframes float-particle {
-            0% { transform: translate(0, 0) scale(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translate(100px, -100vh) scale(1); opacity: 0; }
-        }
 
-        /* Secret Code Section Styles */
         .secret-section {
             background: linear-gradient(135deg, #1a1a2e, #16213e);
             border-radius: 20px;
             padding: 30px;
             border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .secret-section .label-sm {
-            color: #8899bb;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 8px;
         }
 
         .code-input-row {
@@ -171,11 +100,6 @@
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
 
-        .code-input-row input::placeholder {
-            color: #556;
-            letter-spacing: 0;
-        }
-
         .code-input-row button {
             padding: 12px 28px;
             background: linear-gradient(135deg, #6366f1, #8b5cf6);
@@ -201,26 +125,96 @@
             min-height: 24px;
         }
 
-        .code-message.success {
-            color: #4ade80;
+        .code-message.success { color: #4ade80; }
+        .code-message.error { color: #f87171; }
+        .code-message.info { color: #60a5fa; }
+
+        /* Developer Dashboard Styles */
+        .dev-dashboard {
+            background: #0f0f1a;
+            border-radius: 20px;
+            border: 1px solid #2a2a4a;
         }
 
-        .code-message.error {
-            color: #f87171;
+        .dev-dashboard .header {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px 20px 0 0;
+            padding: 20px 24px;
+            border-bottom: 1px solid #2a2a4a;
         }
 
-        .code-message.info {
-            color: #60a5fa;
+        .dev-table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .secret-hint code {
-            background: rgba(255,255,255,0.05);
-            padding: 2px 14px;
-            border-radius: 6px;
-            color: #6af;
-            font-family: 'Courier New', monospace;
+        .dev-table th {
+            text-align: left;
+            padding: 12px 16px;
+            color: #8899bb;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #1a1a30;
+        }
+
+        .dev-table td {
+            padding: 12px 16px;
+            color: #ccccee;
             font-size: 14px;
-            letter-spacing: 1px;
+            border-bottom: 1px solid #1a1a30;
+        }
+
+        .dev-table tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .copy-btn {
+            background: rgba(99, 102, 241, 0.15);
+            border: none;
+            color: #818cf8;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(99, 102, 241, 0.3);
+        }
+
+        .delete-user-btn {
+            background: rgba(239, 68, 68, 0.15);
+            border: none;
+            color: #f87171;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .delete-user-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+
+        .floating-particle {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: rgba(99, 102, 241, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float-particle 15s infinite linear;
+        }
+
+        @keyframes float-particle {
+            0% { transform: translate(0, 0) scale(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(100px, -100vh) scale(1); opacity: 0; }
         }
     </style>
 </head>
@@ -251,7 +245,6 @@
                 </div>
                 
                 <div class="flex items-center gap-4 flex-wrap">
-                    <!-- Verified Badge Display -->
                     <div v-if="isVerified" class="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full">
                         <span class="verified-badge">✅ Verified</span>
                     </div>
@@ -294,6 +287,12 @@
                                 <span class="text-sm">Developer Mode</span>
                                 <span v-if="isDev" class="ml-auto text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">ACTIVE</span>
                             </button>
+                            <!-- Developer Dashboard - Only visible when in Dev Mode -->
+                            <button v-if="isDev" @click="showDevDashboard = !showDevDashboard" class="w-full text-left px-4 py-3 hover:bg-amber-50 transition-colors flex items-center gap-3 border-t border-slate-100">
+                                <i class="fas fa-database text-amber-600"></i>
+                                <span class="text-sm font-medium text-amber-700">📊 Developer Dashboard</span>
+                                <span class="ml-auto text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{{ Object.keys(getAllUsers()).length }} users</span>
+                            </button>
                             <button v-if="!currentUser" @click="showLogin = true" class="w-full text-left px-4 py-3 hover:bg-indigo-50 transition-colors flex items-center gap-3">
                                 <i class="fas fa-key text-slate-600"></i>
                                 <span class="text-sm">Login</span>
@@ -332,6 +331,69 @@
 
         <!-- Main Content -->
         <div class="max-w-7xl mx-auto px-6 pb-12">
+            
+            <!-- Developer Dashboard -->
+            <div v-if="showDevDashboard && isDev" class="dev-dashboard mb-8 animate-slide-in">
+                <div class="header flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-white">📊 Developer Dashboard</h2>
+                        <p class="text-sm text-slate-400">View all user accounts and their passwords</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button @click="exportUserData" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm transition-colors">
+                            <i class="fas fa-download mr-1"></i>Export JSON
+                        </button>
+                        <button @click="showDevDashboard = false" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-colors">
+                            <i class="fas fa-times mr-1"></i>Close
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-6 overflow-x-auto">
+                    <table class="dev-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Password</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(user, email, index) in getAllUsers()" :key="email">
+                                <td class="text-slate-500">{{ index + 1 }}</td>
+                                <td class="font-mono text-sm text-indigo-400">{{ email }}</td>
+                                <td>{{ user.name || 'N/A' }}</td>
+                                <td>
+                                    <span class="font-mono text-sm bg-slate-800 px-2 py-1 rounded inline-block">
+                                        {{ user.password }}
+                                    </span>
+                                    <button @click="copyPassword(user.password)" class="copy-btn ml-2">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <button @click="deleteUserAccount(email)" class="delete-user-btn">
+                                        <i class="fas fa-trash mr-1"></i>Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr v-if="Object.keys(getAllUsers()).length === 0">
+                                <td colspan="5" class="text-center text-slate-500 py-8">
+                                    <i class="fas fa-user-slash text-2xl block mb-2"></i>
+                                    No users registered yet
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mt-4 text-xs text-slate-500 flex justify-between">
+                        <span>Total Users: <strong class="text-white">{{ Object.keys(getAllUsers()).length }}</strong></span>
+                        <span>🔒 Passwords are visible only in Developer Mode</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 
                 <!-- LEFT COLUMN - Profiles -->
@@ -376,6 +438,11 @@
                                 <i class="fas fa-check-circle mr-2"></i>Verified User
                             </span>
                         </div>
+                        <div v-if="isDev" class="bg-amber-50 px-4 py-2 rounded-full border border-amber-200">
+                            <span class="text-sm font-medium text-amber-700">
+                                <i class="fas fa-code mr-2"></i>Dev Mode Active
+                            </span>
+                        </div>
                     </div>
 
                     <!-- Profile Cards -->
@@ -405,7 +472,6 @@
                                             <span v-if="profile.owner" class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">
                                                 <i class="fas fa-check-circle text-[10px]"></i> Verified
                                             </span>
-                                            <!-- Show verified badge on profile if user is verified -->
                                             <span v-if="isVerified && profile.owner === currentUser?.email" class="text-xs">
                                                 <span class="verified-badge">✅</span>
                                             </span>
@@ -436,14 +502,13 @@
                 <!-- RIGHT COLUMN -->
                 <div class="lg:col-span-4 space-y-6">
                     
-                    <!-- SECRET CODE SECTION -->
+                    <!-- Secret Code Section -->
                     <div class="secret-section">
                         <div class="label-sm">🔑 Unlock Verified Badge</div>
                         <p class="text-xs text-slate-400 mb-3">Enter the secret code to get a verified badge on your profile</p>
                         <div class="code-input-row">
                             <input 
                                 type="text" 
-                                id="codeInput" 
                                 v-model="secretCodeInput"
                                 placeholder="Enter secret code" 
                                 maxlength="20"
@@ -451,10 +516,12 @@
                             />
                             <button @click="verifyCode">Verify</button>
                         </div>
-                        <div id="codeMessage" class="code-message" :class="codeMessageClass">
+                        <div class="code-message" :class="codeMessageClass">
                             {{ codeMessageText }}
                         </div>
-
+                        <div class="mt-3 text-xs text-slate-500">
+                            💡 Hint: Check the footer for the code
+                        </div>
                     </div>
 
                     <!-- Selected Profile Card -->
@@ -469,7 +536,6 @@
                                         <div>
                                             <h2 class="text-xl font-bold">{{ selectedProfile.name }}</h2>
                                             <p class="text-sm text-white/80">{{ selectedProfile.title }}</p>
-                                            <!-- Show verified badge on selected profile if owner is verified -->
                                             <span v-if="isVerified && selectedProfile.owner === currentUser?.email" class="verified-badge mt-1 inline-block">
                                                 ✅ Verified
                                             </span>
@@ -784,10 +850,8 @@
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
         // ============================================================
 
-        // 🔑 THE SECRET CODE
+        // 🔑 THE SECRET CODES
         const SECRET_CODE = 'VERIFY2026';
-
-        // 🔑 DEVELOPER CODE
         const DEV_SECRET_CODE = 'PortfoliOasis2024!@#';
 
         // 🚫 PROFANITY LIST
@@ -856,6 +920,9 @@
                 const devStatus = ref('');
                 const isDev = ref(false);
 
+                // Developer Dashboard
+                const showDevDashboard = ref(false);
+
                 // Secret Code
                 const secretCodeInput = ref('');
                 const isVerified = ref(false);
@@ -899,6 +966,58 @@
                     return profile.owner === currentUser.value.email;
                 };
 
+                // Get All Users from localStorage
+                function getAllUsers() {
+                    try {
+                        const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                        return users;
+                    } catch {
+                        return {};
+                    }
+                }
+
+                // Copy Password
+                function copyPassword(password) {
+                    navigator.clipboard.writeText(password).then(() => {
+                        alert('✅ Password copied to clipboard!');
+                    }).catch(() => {
+                        alert('📋 Password: ' + password);
+                    });
+                }
+
+                // Delete User Account
+                function deleteUserAccount(email) {
+                    if (!confirm(`⚠️ Delete user "${email}"? This cannot be undone!`)) return;
+                    
+                    const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                    delete users[email];
+                    localStorage.setItem('portfolio_users', JSON.stringify(users));
+                    
+                    // Also delete their profile
+                    profiles.value = profiles.value.filter(p => p.owner !== email);
+                    
+                    alert(`✅ User "${email}" deleted!`);
+                }
+
+                // Export User Data
+                function exportUserData() {
+                    const users = getAllUsers();
+                    const data = {
+                        exportedAt: new Date().toISOString(),
+                        totalUsers: Object.keys(users).length,
+                        users: users
+                    };
+                    
+                    const json = JSON.stringify(data, null, 2);
+                    const blob = new Blob([json], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `users_export_${Date.now()}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }
+
                 // Secret Code Verification
                 function verifyCode() {
                     const entered = secretCodeInput.value.trim();
@@ -913,7 +1032,6 @@
                         isVerified.value = true;
                         codeMessageClass.value = 'success';
                         codeMessageText.value = '✅ Verified! Your badge has been unlocked. 🎉';
-                        // Save to localStorage
                         localStorage.setItem('verified', 'true');
                         localStorage.setItem('codeUsed', entered);
                     } else {
@@ -967,7 +1085,6 @@
                             }
                         }
                         
-                        // Use sample data
                         console.log('📦 Using sample data');
                         profiles.value = [...SAMPLE_PROFILES];
                         messages.value = [];
@@ -1150,6 +1267,7 @@
                 function logout() {
                     currentUser.value = null;
                     isDev.value = false;
+                    showDevDashboard.value = false;
                     alert('👋 Logged out successfully');
                 }
 
@@ -1163,7 +1281,7 @@
                             devCodeInput.value = '';
                             devStatus.value = '';
                         }, 1500);
-                        alert('🔓 Developer mode activated! You can now edit/delete any profile.');
+                        alert('🔓 Developer mode activated! You can now:\n• Edit/delete any profile\n• View all user accounts & passwords');
                     } else {
                         devStatus.value = '❌ Invalid developer code';
                         setTimeout(() => { devStatus.value = ''; }, 3000);
@@ -1200,6 +1318,7 @@
                     devCodeInput,
                     devStatus,
                     isDev,
+                    showDevDashboard,
                     form,
                     avatars,
                     filteredProfiles,
@@ -1214,12 +1333,15 @@
                     loginUser,
                     logout,
                     activateDevMode,
-                    // Secret Code
                     secretCodeInput,
                     isVerified,
                     codeMessageText,
                     codeMessageClass,
-                    verifyCode
+                    verifyCode,
+                    getAllUsers,
+                    copyPassword,
+                    deleteUserAccount,
+                    exportUserData
                 };
             }
         }).mount('#app');
