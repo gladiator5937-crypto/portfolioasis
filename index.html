@@ -8,1343 +8,1470 @@
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes popIn {
-            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
-            70% { transform: scale(1.2) rotate(2deg); }
-            100% { transform: scale(1) rotate(0); opacity: 1; }
-        }
-        
+        @keyframes float { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-10px)} }
+        @keyframes slideIn { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes popIn { 0%{transform:scale(0) rotate(-10deg); opacity:0} 70%{transform:scale(1.2) rotate(2deg)} 100%{transform:scale(1) rotate(0); opacity:1} }
+        @keyframes bellRing { 0%,100%{transform:rotate(0)} 25%{transform:rotate(10deg)} 75%{transform:rotate(-10deg)} }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
         .animate-float { animation: float 3s ease-in-out infinite; }
         .animate-slide-in { animation: slideIn 0.5s ease-out forwards; }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .verified-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: #1d9bf0;
-            color: white;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 3px 14px;
-            border-radius: 30px;
-            letter-spacing: 0.3px;
-            animation: popIn 0.5s ease-out;
-        }
-        
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-        }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        
-        .card-hover {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .card-hover:hover {
-            transform: translateY(-4px) scale(1.01);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-        }
-
-        .secret-section {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border-radius: 20px;
-            padding: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .code-input-row {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .code-input-row input {
-            flex: 1;
-            padding: 12px 18px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 12px;
-            color: #eee;
-            font-size: 16px;
-            font-family: 'Courier New', monospace;
-            letter-spacing: 2px;
-            transition: all 0.3s;
-        }
-
-        .code-input-row input:focus {
-            outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-        }
-
-        .code-input-row button {
-            padding: 12px 28px;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            font-size: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .code-input-row button:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
-        }
-
-        .code-message {
-            margin-top: 12px;
-            font-size: 14px;
-            font-weight: 500;
-            min-height: 24px;
-        }
-
-        .code-message.success { color: #4ade80; }
-        .code-message.error { color: #f87171; }
-        .code-message.info { color: #60a5fa; }
-
-        /* Developer Dashboard Styles */
-        .dev-dashboard {
-            background: #0f0f1a;
-            border-radius: 20px;
-            border: 1px solid #2a2a4a;
-        }
-
-        .dev-dashboard .header {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
-            border-radius: 20px 20px 0 0;
-            padding: 20px 24px;
-            border-bottom: 1px solid #2a2a4a;
-        }
-
-        .dev-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .dev-table th {
-            text-align: left;
-            padding: 12px 16px;
-            color: #8899bb;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-bottom: 1px solid #1a1a30;
-        }
-
-        .dev-table td {
-            padding: 12px 16px;
-            color: #ccccee;
-            font-size: 14px;
-            border-bottom: 1px solid #1a1a30;
-        }
-
-        .dev-table tr:hover td {
-            background: rgba(255,255,255,0.02);
-        }
-
-        .copy-btn {
-            background: rgba(99, 102, 241, 0.15);
-            border: none;
-            color: #818cf8;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .copy-btn:hover {
-            background: rgba(99, 102, 241, 0.3);
-        }
-
-        .delete-user-btn {
-            background: rgba(239, 68, 68, 0.15);
-            border: none;
-            color: #f87171;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .delete-user-btn:hover {
-            background: rgba(239, 68, 68, 0.3);
-        }
-
-        .floating-particle {
-            position: fixed;
-            width: 6px;
-            height: 6px;
-            background: rgba(99, 102, 241, 0.1);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: float-particle 15s infinite linear;
-        }
-
-        @keyframes float-particle {
-            0% { transform: translate(0, 0) scale(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translate(100px, -100vh) scale(1); opacity: 0; }
-        }
+        .glass-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); }
+        .gradient-text { background: linear-gradient(135deg,#6366f1,#8b5cf6,#d946ef); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+        .verified-badge { display:inline-flex; align-items:center; gap:6px; background:#1d9bf0; color:white; font-size:12px; font-weight:600; padding:3px 14px; border-radius:30px; letter-spacing:0.3px; animation:popIn 0.5s ease-out; }
+        .scrollbar-hide::-webkit-scrollbar { display:none; }
+        .scrollbar-hide { -ms-overflow-style:none; scrollbar-width:none; }
+        .card-hover { transition: all 0.4s cubic-bezier(0.4,0,0.2,1); }
+        .card-hover:hover { transform:translateY(-4px) scale(1.01); box-shadow:0 20px 60px rgba(0,0,0,0.08); }
+        .secret-section { background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:20px; padding:30px; border:1px solid rgba(255,255,255,0.1); }
+        .code-input-row { display:flex; gap:12px; align-items:center; }
+        .code-input-row input { flex:1; padding:12px 18px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15); border-radius:12px; color:#eee; font-size:16px; font-family:'Courier New',monospace; letter-spacing:2px; transition:all 0.3s; }
+        .code-input-row input:focus { outline:none; border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,0.15); }
+        .code-input-row button { padding:12px 28px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border:none; border-radius:12px; color:white; font-weight:600; font-size:15px; cursor:pointer; transition:all 0.3s; white-space:nowrap; }
+        .code-input-row button:hover { transform:scale(1.02); box-shadow:0 8px 25px rgba(99,102,241,0.3); }
+        .code-message { margin-top:12px; font-size:14px; font-weight:500; min-height:24px; }
+        .code-message.success { color:#4ade80; }
+        .code-message.error { color:#f87171; }
+        .code-message.info { color:#60a5fa; }
+        .dev-dashboard { background:#0f0f1a; border-radius:20px; border:1px solid #2a2a4a; }
+        .dev-dashboard .header { background:linear-gradient(135deg,#1a1a2e,#16213e); border-radius:20px 20px 0 0; padding:20px 24px; border-bottom:1px solid #2a2a4a; }
+        .dev-table { width:100%; border-collapse:collapse; }
+        .dev-table th { text-align:left; padding:12px 16px; color:#8899bb; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid #1a1a30; }
+        .dev-table td { padding:12px 16px; color:#ccccee; font-size:14px; border-bottom:1px solid #1a1a30; }
+        .dev-table tr:hover td { background:rgba(255,255,255,0.02); }
+        .copy-btn { background:rgba(99,102,241,0.15); border:none; color:#818cf8; padding:4px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:0.2s; }
+        .copy-btn:hover { background:rgba(99,102,241,0.3); }
+        .delete-user-btn { background:rgba(239,68,68,0.15); border:none; color:#f87171; padding:4px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:0.2s; }
+        .delete-user-btn:hover { background:rgba(239,68,68,0.3); }
+        .floating-particle { position:fixed; width:6px; height:6px; background:rgba(99,102,241,0.1); border-radius:50%; pointer-events:none; animation:float-particle 15s infinite linear; z-index:0; }
+        @keyframes float-particle { 0%{transform:translate(0,0) scale(0); opacity:0} 10%{opacity:1} 90%{opacity:1} 100%{transform:translate(100px,-100vh) scale(1); opacity:0} }
+        .bell-ring { animation: bellRing 0.6s ease-in-out; }
+        .news-item { border-left: 3px solid #6366f1; padding-left: 12px; margin-bottom: 12px; }
+        .news-item .dev-tag { background:#d946ef; color:white; font-size:10px; padding:2px 10px; border-radius:20px; display:inline-block; margin-left:8px; }
+        .like-btn:disabled { opacity:0.5; cursor:not-allowed; }
+        .like-btn { transition: all 0.2s; }
+        .like-btn:active:not(:disabled) { transform: scale(0.9); }
+        .profile-avatar { transition: all 0.3s; }
+        .profile-avatar:hover { transform: scale(1.05) rotate(-5deg); }
+        .badge-pulse { animation: pulse 2s infinite; }
+        .gradient-border { background: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef); padding: 2px; border-radius: 16px; }
+        .gradient-border > div { background: white; border-radius: 14px; }
+        .toast { position: fixed; bottom: 20px; right: 20px; z-index: 9999; animation: slideIn 0.5s ease-out; }
+        .modal-overlay { background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); }
+        .chat-message { transition: all 0.2s; }
+        .chat-message:hover { background: #f8fafc; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen">
 
-    <div id="app">
-        <!-- Floating Particles -->
-        <div v-for="i in 20" :key="i" class="floating-particle" 
-             :style="{
-                 left: Math.random() * 100 + '%',
-                 top: Math.random() * 100 + '%',
-                 animationDelay: Math.random() * 15 + 's',
-                 animationDuration: (10 + Math.random() * 20) + 's'
-             }">
+<div id="app">
+    <!-- Toast Notification -->
+    <div v-if="toast.show" class="toast bg-white rounded-2xl shadow-2xl p-4 border border-slate-200 max-w-sm">
+        <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" 
+                 :class="toast.type === 'success' ? 'bg-green-100 text-green-600' : toast.type === 'error' ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'">
+                <i :class="toast.type === 'success' ? 'fas fa-check-circle' : toast.type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-info-circle'"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-sm font-medium text-slate-800">{{ toast.message }}</p>
+                <p class="text-xs text-slate-400">{{ toast.time }}</p>
+            </div>
+            <button @click="toast.show = false" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times"></i></button>
         </div>
+    </div>
 
-        <!-- Header -->
-        <header class="glass-card sticky top-0 z-50 px-6 py-4 shadow-xl border-b border-white/20">
-            <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg animate-float">
-                        <span class="text-2xl">🌟</span>
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-extrabold gradient-text tracking-tight">PortfoliOasis</h1>
-                        <p class="text-xs text-slate-400 font-medium">🚀 Where Talent Meets Opportunity</p>
-                    </div>
+    <!-- Floating Particles -->
+    <div v-for="i in 25" :key="i" class="floating-particle" 
+         :style="{ left: Math.random()*100+'%', top: Math.random()*100+'%', animationDelay: Math.random()*15+'s', animationDuration: (10+Math.random()*20)+'s' }">
+    </div>
+
+    <!-- Header -->
+    <header class="glass-card sticky top-0 z-50 px-6 py-4 shadow-xl border-b border-white/20">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg animate-float">
+                    <span class="text-2xl">🌟</span>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-extrabold gradient-text tracking-tight">PortfoliOasis</h1>
+                    <p class="text-xs text-slate-400 font-medium">🚀 Where Talent Meets Opportunity</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-4 flex-wrap">
+                <!-- BELL ICON with NEWS -->
+                <div class="relative cursor-pointer" @click="toggleNewsModal">
+                    <i class="fas fa-bell text-2xl text-slate-600 hover:text-indigo-600 transition-colors" 
+                       :class="{ 'bell-ring': newNotification }"></i>
+                    <span v-if="unreadNewsCount > 0" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                        {{ unreadNewsCount }}
+                    </span>
+                </div>
+
+                <div v-if="isVerified" class="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full border border-green-200">
+                    <span class="verified-badge">✅ Verified</span>
+                </div>
+
+                <div class="flex items-center gap-2 bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm border border-white/30">
+                    <i class="fas fa-users text-indigo-500 text-sm"></i>
+                    <span class="text-sm font-bold text-slate-700">{{ profiles.length }}</span>
+                    <span class="text-xs text-slate-400">profiles</span>
                 </div>
                 
-                <div class="flex items-center gap-4 flex-wrap">
-                    <div v-if="isVerified" class="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full">
-                        <span class="verified-badge">✅ Verified</span>
+                <div v-if="currentUser" class="flex items-center gap-3 bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm border border-white/30">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold">
+                        {{ currentUser.name.charAt(0).toUpperCase() }}
                     </div>
-
-                    <div class="flex items-center gap-2 bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm">
-                        <i class="fas fa-users text-indigo-500 text-sm"></i>
-                        <span class="text-sm font-bold text-slate-700">{{ profiles.length }}</span>
-                        <span class="text-xs text-slate-400">profiles</span>
-                    </div>
-                    
-                    <div v-if="currentUser" class="flex items-center gap-3 bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold">
-                            {{ currentUser.name.charAt(0).toUpperCase() }}
-                        </div>
-                        <span class="text-sm font-medium text-slate-700">{{ currentUser.name }}</span>
-                        <button @click="logout" class="text-xs text-red-400 hover:text-red-600 transition-colors">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
-                    </div>
-                    
-                    <button v-else @click="showLogin = true" 
-                            class="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-all hover:scale-105 text-sm">
-                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    <span class="text-sm font-medium text-slate-700">{{ currentUser.name }}</span>
+                    <button @click="logout" class="text-xs text-red-400 hover:text-red-600 transition-colors">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+                
+                <button v-else @click="showLogin = true" 
+                        class="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-all hover:scale-105 text-sm">
+                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                </button>
+                
+                <div class="relative" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
+                    <button class="w-10 h-10 rounded-full hover:bg-white/50 transition-all flex items-center justify-center text-slate-500 hover:text-slate-700">
+                        <i class="fas fa-ellipsis-v text-lg"></i>
                     </button>
                     
-                    <div class="relative" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
-                        <button class="w-10 h-10 rounded-full hover:bg-white/50 transition-all flex items-center justify-center text-slate-500 hover:text-slate-700">
-                            <i class="fas fa-ellipsis-v text-lg"></i>
+                    <div v-show="showDropdown" 
+                         class="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 overflow-hidden transition-all origin-top-right">
+                        <div class="p-3 border-b border-slate-100">
+                            <p class="text-xs font-medium text-slate-400">ACCOUNT</p>
+                            <p class="text-sm font-semibold text-slate-800" v-if="currentUser">{{ currentUser.name }}</p>
+                            <p class="text-sm text-slate-400" v-else>Not logged in</p>
+                        </div>
+                        <button @click="showDev = true" class="w-full text-left px-4 py-3 hover:bg-indigo-50 transition-colors flex items-center gap-3">
+                            <i class="fas fa-cog text-slate-600"></i>
+                            <span class="text-sm">Developer Mode</span>
+                            <span v-if="isDev" class="ml-auto text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">ACTIVE</span>
                         </button>
-                        
-                        <div v-show="showDropdown" 
-                             class="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 overflow-hidden transition-all origin-top-right">
-                            <div class="p-3 border-b border-slate-100">
-                                <p class="text-xs font-medium text-slate-400">ACCOUNT</p>
-                                <p class="text-sm font-semibold text-slate-800" v-if="currentUser">{{ currentUser.name }}</p>
-                                <p class="text-sm text-slate-400" v-else>Not logged in</p>
-                            </div>
-                            <button @click="showDev = true" class="w-full text-left px-4 py-3 hover:bg-indigo-50 transition-colors flex items-center gap-3">
-                                <i class="fas fa-cog text-slate-600"></i>
-                                <span class="text-sm">Developer Mode</span>
-                                <span v-if="isDev" class="ml-auto text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">ACTIVE</span>
-                            </button>
-                            <!-- Developer Dashboard - Only visible when in Dev Mode -->
-                            <button v-if="isDev" @click="showDevDashboard = !showDevDashboard" class="w-full text-left px-4 py-3 hover:bg-amber-50 transition-colors flex items-center gap-3 border-t border-slate-100">
-                                <i class="fas fa-database text-amber-600"></i>
-                                <span class="text-sm font-medium text-amber-700">📊 Developer Dashboard</span>
-                                <span class="ml-auto text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{{ Object.keys(getAllUsers()).length }} users</span>
-                            </button>
-                            <button v-if="!currentUser" @click="showLogin = true" class="w-full text-left px-4 py-3 hover:bg-indigo-50 transition-colors flex items-center gap-3">
-                                <i class="fas fa-key text-slate-600"></i>
-                                <span class="text-sm">Login</span>
-                            </button>
-                            <button v-else @click="logout" class="w-full text-left px-4 py-3 hover:bg-red-50 transition-colors flex items-center gap-3 text-red-600">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span class="text-sm">Logout</span>
-                            </button>
-                            <div class="border-t border-slate-100 px-4 py-2 text-xs text-slate-400 flex justify-between">
-                                <span><i class="fas fa-user mr-1"></i>{{ profiles.length }} profiles</span>
-                                <span><i class="fas fa-comment mr-1"></i>{{ messages.length }} messages</span>
-                            </div>
+                        <button v-if="isDev" @click="showDevDashboard = !showDevDashboard" class="w-full text-left px-4 py-3 hover:bg-amber-50 transition-colors flex items-center gap-3 border-t border-slate-100">
+                            <i class="fas fa-database text-amber-600"></i>
+                            <span class="text-sm font-medium text-amber-700">📊 Developer Dashboard</span>
+                            <span class="ml-auto text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">{{ Object.keys(getAllUsers()).length }} users</span>
+                        </button>
+                        <button v-if="!currentUser" @click="showLogin = true" class="w-full text-left px-4 py-3 hover:bg-indigo-50 transition-colors flex items-center gap-3">
+                            <i class="fas fa-key text-slate-600"></i>
+                            <span class="text-sm">Login</span>
+                        </button>
+                        <button v-else @click="logout" class="w-full text-left px-4 py-3 hover:bg-red-50 transition-colors flex items-center gap-3 text-red-600">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span class="text-sm">Logout</span>
+                        </button>
+                        <div class="border-t border-slate-100 px-4 py-2 text-xs text-slate-400 flex justify-between">
+                            <span><i class="fas fa-user mr-1"></i>{{ profiles.length }} profiles</span>
+                            <span><i class="fas fa-comment mr-1"></i>{{ messages.length }} messages</span>
                         </div>
                     </div>
                 </div>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <!-- Hero Section -->
-        <div class="relative overflow-hidden">
-            <div class="max-w-7xl mx-auto px-6 py-12">
-                <div class="text-center">
-                    <div class="inline-block px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mb-4 animate-float">
-                        <i class="fas fa-sparkles mr-2"></i> Discover Amazing Talent
+    <!-- NEWS MODAL -->
+    <div v-if="showNewsModal" class="fixed inset-0 modal-overlay flex items-center justify-center z-50 p-4" @click.self="showNewsModal = false">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 max-h-[80vh] flex flex-col animate-slide-in">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h2 class="text-xl font-bold text-slate-800"><i class="fas fa-newspaper text-indigo-500 mr-2"></i>News & Updates</h2>
+                <button @click="showNewsModal = false" class="text-slate-400 hover:text-slate-600 transition-colors"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="flex-1 overflow-y-auto mt-4 space-y-2 scrollbar-hide">
+                <div v-if="newsItems.length === 0" class="text-center py-8 text-slate-400">
+                    <i class="fas fa-inbox text-4xl block mb-3"></i>
+                    <p>No news yet. Stay tuned!</p>
+                </div>
+                <div v-for="(item, idx) in newsItems" :key="idx" class="news-item flex justify-between items-start bg-slate-50 rounded-xl p-3 hover:bg-slate-100 transition-colors">
+                    <div class="flex-1">
+                        <div class="flex items-center flex-wrap gap-1">
+                            <span class="font-semibold text-slate-800">{{ item.title }}</span>
+                            <span class="dev-tag" v-if="item.fromDev">👨‍💻 Developer</span>
+                            <span class="text-xs text-slate-400 ml-2">{{ item.time }}</span>
+                        </div>
+                        <p class="text-sm text-slate-600 mt-1">{{ item.body }}</p>
                     </div>
-                    <h2 class="text-4xl md:text-6xl font-extrabold gradient-text leading-tight">
-                        Find Your Next<br>Creative Partner
-                    </h2>
-                    <p class="text-slate-500 mt-4 max-w-2xl mx-auto text-lg">
-                        Connect with designers, developers, and creators from around the world.
-                        Build your network and grow your career.
-                    </p>
+                    <button v-if="isDev || (currentUser && item.author === currentUser.email)" @click="deleteNewsItem(idx)" class="text-red-400 hover:text-red-600 text-sm ml-2 transition-colors"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+            <!-- Add news (only dev) -->
+            <div v-if="isDev" class="border-t pt-4 mt-2">
+                <div class="flex gap-2">
+                    <input v-model="newsTitle" placeholder="Title" class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                    <input v-model="newsBody" placeholder="News body..." class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                    <button @click="addNewsItem" class="px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors text-sm"><i class="fas fa-plus"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6 py-12">
+            <div class="text-center">
+                <div class="inline-block px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mb-4 animate-float">
+                    <i class="fas fa-sparkles mr-2"></i> Discover Amazing Talent
+                </div>
+                <h2 class="text-4xl md:text-6xl font-extrabold gradient-text leading-tight">
+                    Find Your Next<br>Creative Partner
+                </h2>
+                <p class="text-slate-500 mt-4 max-w-2xl mx-auto text-lg">
+                    Connect with designers, developers, and creators from around the world.
+                    Build your network and grow your career.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-6 pb-12">
+        
+        <!-- Developer Dashboard -->
+        <div v-if="showDevDashboard && isDev" class="dev-dashboard mb-8 animate-slide-in">
+            <div class="header flex justify-between items-center">
+                <div>
+                    <h2 class="text-xl font-bold text-white">📊 Developer Dashboard</h2>
+                    <p class="text-sm text-slate-400">View all user accounts and their passwords</p>
+                </div>
+                <div class="flex gap-2">
+                    <button @click="exportUserData" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm transition-colors">
+                        <i class="fas fa-download mr-1"></i>Export JSON
+                    </button>
+                    <button @click="showDevDashboard = false" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-colors">
+                        <i class="fas fa-times mr-1"></i>Close
+                    </button>
+                </div>
+            </div>
+            <div class="p-6 overflow-x-auto">
+                <table class="dev-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Password</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(user, email, index) in getAllUsers()" :key="email">
+                            <td class="text-slate-500">{{ index + 1 }}</td>
+                            <td class="font-mono text-sm text-indigo-400">{{ email }}</td>
+                            <td>{{ user.name || 'N/A' }}</td>
+                            <td>
+                                <span class="font-mono text-sm bg-slate-800 px-2 py-1 rounded inline-block">
+                                    {{ user.password }}
+                                </span>
+                                <button @click="copyPassword(user.password)" class="copy-btn ml-2">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </td>
+                            <td>
+                                <button @click="deleteUserAccount(email)" class="delete-user-btn">
+                                    <i class="fas fa-trash mr-1"></i>Delete
+                                </button>
+                            </td>
+                        </tr>
+                        <tr v-if="Object.keys(getAllUsers()).length === 0">
+                            <td colspan="5" class="text-center text-slate-500 py-8">
+                                <i class="fas fa-user-slash text-2xl block mb-2"></i>
+                                No users registered yet
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="mt-4 text-xs text-slate-500 flex justify-between">
+                    <span>Total Users: <strong class="text-white">{{ Object.keys(getAllUsers()).length }}</strong></span>
+                    <span>🔒 Passwords are visible only in Developer Mode</span>
                 </div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="max-w-7xl mx-auto px-6 pb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <!-- Developer Dashboard -->
-            <div v-if="showDevDashboard && isDev" class="dev-dashboard mb-8 animate-slide-in">
-                <div class="header flex justify-between items-center">
-                    <div>
-                        <h2 class="text-xl font-bold text-white">📊 Developer Dashboard</h2>
-                        <p class="text-sm text-slate-400">View all user accounts and their passwords</p>
-                    </div>
-                    <div class="flex gap-2">
-                        <button @click="exportUserData" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm transition-colors">
-                            <i class="fas fa-download mr-1"></i>Export JSON
-                        </button>
-                        <button @click="showDevDashboard = false" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm transition-colors">
-                            <i class="fas fa-times mr-1"></i>Close
-                        </button>
+            <!-- LEFT COLUMN - Profiles -->
+            <div class="lg:col-span-8 space-y-6">
+                <!-- Search Bar -->
+                <div class="gradient-border">
+                    <div class="p-6">
+                        <div class="flex items-center gap-4">
+                            <i class="fas fa-search text-slate-400 text-xl"></i>
+                            <input
+                                type="text"
+                                class="flex-1 bg-transparent focus:outline-none text-slate-800 placeholder-slate-400 text-lg"
+                                placeholder="Search by name, skills, or title..."
+                                v-model="searchQuery"
+                            />
+                            <button v-if="searchQuery" @click="searchQuery = ''" class="text-slate-400 hover:text-slate-600 transition-colors">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <button class="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-all">
+                                <i class="fas fa-sliders-h mr-2"></i>Filter
+                            </button>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="p-6 overflow-x-auto">
-                    <table class="dev-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Email</th>
-                                <th>Name</th>
-                                <th>Password</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(user, email, index) in getAllUsers()" :key="email">
-                                <td class="text-slate-500">{{ index + 1 }}</td>
-                                <td class="font-mono text-sm text-indigo-400">{{ email }}</td>
-                                <td>{{ user.name || 'N/A' }}</td>
-                                <td>
-                                    <span class="font-mono text-sm bg-slate-800 px-2 py-1 rounded inline-block">
-                                        {{ user.password }}
+
+                <!-- Stats -->
+                <div class="flex gap-4 flex-wrap">
+                    <div class="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full border border-slate-200">
+                        <span class="text-sm font-medium text-slate-600">
+                            <i class="fas fa-user-check text-indigo-500 mr-2"></i>
+                            {{ filteredProfiles.length }} results
+                        </span>
+                    </div>
+                    <div class="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full border border-slate-200">
+                        <span class="text-sm font-medium text-slate-600">
+                            <i class="fas fa-users text-indigo-500 mr-2"></i>
+                            {{ profiles.length }} total
+                        </span>
+                    </div>
+                    <div v-if="isVerified" class="bg-green-50 px-4 py-2 rounded-full border border-green-200">
+                        <span class="text-sm font-medium text-green-700">
+                            <i class="fas fa-check-circle mr-2"></i>Verified User
+                        </span>
+                    </div>
+                    <div v-if="isDev" class="bg-amber-50 px-4 py-2 rounded-full border border-amber-200">
+                        <span class="text-sm font-medium text-amber-700">
+                            <i class="fas fa-code mr-2"></i>Dev Mode Active
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Profile Cards -->
+                <div v-if="filteredProfiles.length === 0" class="text-center py-20">
+                    <div class="text-6xl mb-4">🔍</div>
+                    <h3 class="text-2xl font-bold text-slate-700">No profiles found</h3>
+                    <p class="text-slate-400 mt-2">Try adjusting your search</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div v-for="(profile, index) in filteredProfiles" :key="profile.id"
+                         @click="selectProfile(profile)"
+                         class="card-hover bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/30 shadow-lg cursor-pointer animate-slide-in"
+                         :style="{ animationDelay: (index * 0.05) + 's' }">
+                        
+                        <div class="flex items-start gap-4">
+                            <div class="profile-avatar w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-3xl flex-shrink-0 shadow-inner">
+                                {{ profile.avatar || '🚀' }}
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <h3 class="font-bold text-slate-900 text-lg truncate">{{ profile.name }}</h3>
+                                        <p class="text-xs font-semibold text-indigo-600">{{ profile.title }}</p>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <span v-if="profile.owner" class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">
+                                            <i class="fas fa-check-circle text-[10px]"></i> Verified
+                                        </span>
+                                    </div>
+                                </div>
+                                <p class="text-sm text-slate-500 mt-2 line-clamp-2">{{ profile.bio }}</p>
+                                <div class="flex gap-2 mt-3 flex-wrap">
+                                    <span v-if="profile.email" class="text-xs bg-slate-100 px-2 py-1 rounded-full">
+                                        <i class="fas fa-envelope text-slate-400 mr-1"></i>Email
                                     </span>
-                                    <button @click="copyPassword(user.password)" class="copy-btn ml-2">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                </td>
-                                <td>
-                                    <button @click="deleteUserAccount(email)" class="delete-user-btn">
-                                        <i class="fas fa-trash mr-1"></i>Delete
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr v-if="Object.keys(getAllUsers()).length === 0">
-                                <td colspan="5" class="text-center text-slate-500 py-8">
-                                    <i class="fas fa-user-slash text-2xl block mb-2"></i>
-                                    No users registered yet
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div class="mt-4 text-xs text-slate-500 flex justify-between">
-                        <span>Total Users: <strong class="text-white">{{ Object.keys(getAllUsers()).length }}</strong></span>
-                        <span>🔒 Passwords are visible only in Developer Mode</span>
+                                    <span v-if="profile.whatsapp" class="text-xs bg-green-50 text-green-600 px-2 py-1 rounded-full">
+                                        <i class="fab fa-whatsapp mr-1"></i>WhatsApp
+                                    </span>
+                                    <span v-if="profile.instagram" class="text-xs bg-pink-50 text-pink-600 px-2 py-1 rounded-full">
+                                        <i class="fab fa-instagram mr-1"></i>Instagram
+                                    </span>
+                                    <span class="text-xs bg-slate-50 px-2 py-1 rounded-full">
+                                        <i class="far fa-clock text-slate-400 mr-1"></i>
+                                        {{ new Date(profile.createdAt).toLocaleDateString() }}
+                                    </span>
+                                    <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full">
+                                        <i class="fas fa-thumbs-up mr-1"></i>{{ profile.likes || 0 }}
+                                    </span>
+                                    <span class="text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full">
+                                        <i class="fas fa-thumbs-down mr-1"></i>{{ profile.dislikes || 0 }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- RIGHT COLUMN -->
+            <div class="lg:col-span-4 space-y-6">
                 
-                <!-- LEFT COLUMN - Profiles -->
-                <div class="lg:col-span-8 space-y-6">
-                    <!-- Search Bar -->
-                    <div class="gradient-border">
-                        <div class="p-6">
-                            <div class="flex items-center gap-4">
-                                <i class="fas fa-search text-slate-400 text-xl"></i>
-                                <input
-                                    type="text"
-                                    class="flex-1 bg-transparent focus:outline-none text-slate-800 placeholder-slate-400 text-lg"
-                                    placeholder="Search by name, skills, or title..."
-                                    v-model="searchQuery"
-                                />
-                                <button v-if="searchQuery" @click="searchQuery = ''" class="text-slate-400 hover:text-slate-600">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                                <button class="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-all">
-                                    <i class="fas fa-sliders-h mr-2"></i>Filter
-                                </button>
-                            </div>
-                        </div>
+                <!-- Secret Code Section -->
+                <div class="secret-section">
+                    <div class="text-sm font-semibold text-white mb-1">🔑 Unlock Verified Badge</div>
+                    <p class="text-xs text-slate-400 mb-3">Enter the secret code to get a verified badge on your profile</p>
+                    <div class="code-input-row">
+                        <input 
+                            type="text" 
+                            v-model="secretCodeInput"
+                            placeholder="Enter secret code" 
+                            maxlength="20"
+                            @keyup.enter="verifyCode"
+                        />
+                        <button @click="verifyCode">Verify</button>
                     </div>
-
-                    <!-- Stats -->
-                    <div class="flex gap-4 flex-wrap">
-                        <div class="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full border border-slate-200">
-                            <span class="text-sm font-medium text-slate-600">
-                                <i class="fas fa-user-check text-indigo-500 mr-2"></i>
-                                {{ filteredProfiles.length }} results
-                            </span>
-                        </div>
-                        <div class="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full border border-slate-200">
-                            <span class="text-sm font-medium text-slate-600">
-                                <i class="fas fa-users text-indigo-500 mr-2"></i>
-                                {{ profiles.length }} total
-                            </span>
-                        </div>
-                        <div v-if="isVerified" class="bg-green-50 px-4 py-2 rounded-full border border-green-200">
-                            <span class="text-sm font-medium text-green-700">
-                                <i class="fas fa-check-circle mr-2"></i>Verified User
-                            </span>
-                        </div>
-                        <div v-if="isDev" class="bg-amber-50 px-4 py-2 rounded-full border border-amber-200">
-                            <span class="text-sm font-medium text-amber-700">
-                                <i class="fas fa-code mr-2"></i>Dev Mode Active
-                            </span>
-                        </div>
+                    <div class="code-message" :class="codeMessageClass">
+                        {{ codeMessageText }}
                     </div>
-
-                    <!-- Profile Cards -->
-                    <div v-if="filteredProfiles.length === 0" class="text-center py-20">
-                        <div class="text-6xl mb-4">🔍</div>
-                        <h3 class="text-2xl font-bold text-slate-700">No profiles found</h3>
-                        <p class="text-slate-400 mt-2">Try adjusting your search</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div v-for="(profile, index) in filteredProfiles" :key="profile.id"
-                             @click="selectProfile(profile)"
-                             class="card-hover bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/30 shadow-lg cursor-pointer animate-slide-in"
-                             :style="{ animationDelay: (index * 0.05) + 's' }">
-                            
-                            <div class="flex items-start gap-4">
-                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-3xl flex-shrink-0 shadow-inner">
-                                    {{ profile.avatar || '🚀' }}
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-bold text-slate-900 text-lg truncate">{{ profile.name }}</h3>
-                                            <p class="text-xs font-semibold text-indigo-600">{{ profile.title }}</p>
-                                        </div>
-                                        <div class="flex items-center gap-1">
-                                            <span v-if="profile.owner" class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">
-                                                <i class="fas fa-check-circle text-[10px]"></i> Verified
-                                            </span>
-                                            <span v-if="isVerified && profile.owner === currentUser?.email" class="text-xs">
-                                                <span class="verified-badge">✅</span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <p class="text-sm text-slate-500 mt-2 line-clamp-2">{{ profile.bio }}</p>
-                                    <div class="flex gap-2 mt-3 flex-wrap">
-                                        <span v-if="profile.email" class="text-xs bg-slate-100 px-2 py-1 rounded-full">
-                                            <i class="fas fa-envelope text-slate-400 mr-1"></i>Email
-                                        </span>
-                                        <span v-if="profile.whatsapp" class="text-xs bg-green-50 text-green-600 px-2 py-1 rounded-full">
-                                            <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                                        </span>
-                                        <span v-if="profile.instagram" class="text-xs bg-pink-50 text-pink-600 px-2 py-1 rounded-full">
-                                            <i class="fab fa-instagram mr-1"></i>Instagram
-                                        </span>
-                                        <span class="text-xs bg-slate-50 px-2 py-1 rounded-full">
-                                            <i class="far fa-clock text-slate-400 mr-1"></i>
-                                            {{ new Date(profile.createdAt).toLocaleDateString() }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="mt-3 text-xs text-slate-500">
+                        💡 Hint: Check the footer for the code
                     </div>
                 </div>
 
-                <!-- RIGHT COLUMN -->
-                <div class="lg:col-span-4 space-y-6">
-                    
-                    <!-- Secret Code Section -->
-                    <div class="secret-section">
-                        <div class="label-sm">🔑 Unlock Verified Badge</div>
-                        <p class="text-xs text-slate-400 mb-3">Enter the secret code to get a verified badge on your profile</p>
-                        <div class="code-input-row">
-                            <input 
-                                type="text" 
-                                v-model="secretCodeInput"
-                                placeholder="Enter secret code" 
-                                maxlength="20"
-                                @keyup.enter="verifyCode"
-                            />
-                            <button @click="verifyCode">Verify</button>
-                        </div>
-                        <div class="code-message" :class="codeMessageClass">
-                            {{ codeMessageText }}
-                        </div>
-                        <div class="mt-3 text-xs text-slate-500">
-                            💡 Hint: Check the footer for the code
-                        </div>
-                    </div>
-
-                    <!-- Selected Profile Card -->
-                    <div v-if="selectedProfile" class="sticky top-28">
-                        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
-                            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-4xl">
-                                            {{ selectedProfile.avatar || '🚀' }}
-                                        </div>
-                                        <div>
-                                            <h2 class="text-xl font-bold">{{ selectedProfile.name }}</h2>
-                                            <p class="text-sm text-white/80">{{ selectedProfile.title }}</p>
-                                            <span v-if="isVerified && selectedProfile.owner === currentUser?.email" class="verified-badge mt-1 inline-block">
-                                                ✅ Verified
-                                            </span>
-                                        </div>
+                <!-- Selected Profile Card -->
+                <div v-if="selectedProfile" class="sticky top-28">
+                    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
+                        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center gap-4">
+                                    <div class="profile-avatar w-20 h-20 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-4xl">
+                                        {{ selectedProfile.avatar || '🚀' }}
                                     </div>
-                                    <button @click="selectedProfile = null" class="text-white/60 hover:text-white">
-                                        <i class="fas fa-times"></i>
+                                    <div>
+                                        <h2 class="text-xl font-bold">{{ selectedProfile.name }}</h2>
+                                        <p class="text-sm text-white/80">{{ selectedProfile.title }}</p>
+                                        <span v-if="isVerified && selectedProfile.owner === currentUser?.email" class="verified-badge mt-1 inline-block">
+                                            ✅ Verified
+                                        </span>
+                                    </div>
+                                </div>
+                                <button @click="selectedProfile = null" class="text-white/60 hover:text-white transition-colors">
+                                    <i class="fas fa-times text-xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 space-y-4">
+                            <div>
+                                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                    <i class="fas fa-user mr-2"></i>About
+                                </h4>
+                                <p class="text-sm text-slate-600 leading-relaxed">{{ selectedProfile.bio }}</p>
+                            </div>
+
+                            <div v-if="selectedProfile.email || selectedProfile.whatsapp || selectedProfile.instagram" class="border-t pt-4">
+                                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                                    <i class="fas fa-address-card mr-2"></i>Contact
+                                </h4>
+                                <div class="flex gap-2 flex-wrap">
+                                    <a v-if="selectedProfile.email" :href="'mailto:' + selectedProfile.email" 
+                                       class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm transition-colors">
+                                        <i class="fas fa-envelope mr-1"></i>Email
+                                    </a>
+                                    <a v-if="selectedProfile.whatsapp" :href="'https://wa.me/' + selectedProfile.whatsapp" target="_blank"
+                                       class="px-3 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl text-sm transition-colors">
+                                        <i class="fab fa-whatsapp mr-1"></i>WhatsApp
+                                    </a>
+                                    <a v-if="selectedProfile.instagram" :href="'https://instagram.com/' + selectedProfile.instagram" target="_blank"
+                                       class="px-3 py-2 bg-pink-50 hover:bg-pink-100 text-pink-700 rounded-xl text-sm transition-colors">
+                                        <i class="fab fa-instagram mr-1"></i>Instagram
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Like / Dislike with login requirement -->
+                            <div class="border-t pt-4">
+                                <div class="flex items-center gap-6">
+                                    <div class="flex items-center gap-2">
+                                        <button @click="likeProfile(selectedProfile.id)" 
+                                                :disabled="!currentUser && !isDev"
+                                                class="like-btn text-green-500 hover:text-green-700 text-xl transition"
+                                                :class="{'opacity-50 cursor-not-allowed': !currentUser && !isDev}">
+                                            <i class="fas fa-thumbs-up"></i>
+                                        </button>
+                                        <span class="font-bold text-slate-700">{{ selectedProfile.likes || 0 }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button @click="dislikeProfile(selectedProfile.id)"
+                                                :disabled="!currentUser && !isDev"
+                                                class="like-btn text-red-400 hover:text-red-600 text-xl transition"
+                                                :class="{'opacity-50 cursor-not-allowed': !currentUser && !isDev}">
+                                            <i class="fas fa-thumbs-down"></i>
+                                        </button>
+                                        <span class="font-bold text-slate-700">{{ selectedProfile.dislikes || 0 }}</span>
+                                    </div>
+                                    <div v-if="isDev" class="text-xs text-slate-400 ml-auto">
+                                        <i class="fas fa-user-secret"></i> Dev: edit likes
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Developer like/dislike editor -->
+                            <div v-if="isDev" class="border-t pt-4">
+                                <div class="flex gap-2 items-center flex-wrap">
+                                    <span class="text-xs text-slate-500 font-medium">Dev adjust:</span>
+                                    <div class="flex items-center gap-1">
+                                        <input type="number" v-model.number="selectedProfile.likes" 
+                                               class="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                                        <span class="text-xs text-slate-500">👍</span>
+                                    </div>
+                                    <div class="flex items-center gap-1">
+                                        <input type="number" v-model.number="selectedProfile.dislikes" 
+                                               class="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none" />
+                                        <span class="text-xs text-slate-500">👎</span>
+                                    </div>
+                                    <button @click="saveData" class="px-3 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded text-xs transition-colors">
+                                        <i class="fas fa-save mr-1"></i>Save
                                     </button>
                                 </div>
                             </div>
-                            
-                            <div class="p-6 space-y-4">
-                                <div>
-                                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                        <i class="fas fa-user mr-2"></i>About
-                                    </h4>
-                                    <p class="text-sm text-slate-600 leading-relaxed">{{ selectedProfile.bio }}</p>
-                                </div>
 
-                                <div v-if="selectedProfile.email || selectedProfile.whatsapp || selectedProfile.instagram" class="border-t pt-4">
-                                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                        <i class="fas fa-address-card mr-2"></i>Contact
-                                    </h4>
-                                    <div class="flex gap-2 flex-wrap">
-                                        <a v-if="selectedProfile.email" :href="'mailto:' + selectedProfile.email" 
-                                           class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm transition-colors">
-                                            <i class="fas fa-envelope mr-1"></i>Email
-                                        </a>
-                                        <a v-if="selectedProfile.whatsapp" :href="'https://wa.me/' + selectedProfile.whatsapp" target="_blank"
-                                           class="px-3 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl text-sm transition-colors">
-                                            <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                                        </a>
-                                        <a v-if="selectedProfile.instagram" :href="'https://instagram.com/' + selectedProfile.instagram" target="_blank"
-                                           class="px-3 py-2 bg-pink-50 hover:bg-pink-100 text-pink-700 rounded-xl text-sm transition-colors">
-                                            <i class="fab fa-instagram mr-1"></i>Instagram
-                                        </a>
-                                    </div>
-                                </div>
+                            <!-- Share -->
+                            <div class="border-t pt-4">
+                                <button @click="shareProfile(selectedProfile)" 
+                                        class="w-full py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-sm font-medium transition-colors">
+                                    <i class="fas fa-share-alt mr-2"></i>Share this portfolio
+                                </button>
+                            </div>
 
-                                <!-- Chat -->
-                                <div class="border-t pt-4">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                                            <i class="fas fa-comments mr-2"></i>Live Chat
-                                        </h4>
-                                        <span class="text-xs text-slate-400">{{ getMessages(selectedProfile.id).length }} messages</span>
+                            <!-- Chat -->
+                            <div class="border-t pt-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                        <i class="fas fa-comments mr-2"></i>Live Chat
+                                    </h4>
+                                    <span class="text-xs text-slate-400">{{ getMessages(selectedProfile.id).length }} messages</span>
+                                </div>
+                                
+                                <div class="bg-slate-50 rounded-2xl p-4 h-52 overflow-y-auto space-y-2 scrollbar-hide">
+                                    <div v-if="getMessages(selectedProfile.id).length === 0" class="text-center py-8">
+                                        <div class="text-3xl mb-2">💬</div>
+                                        <p class="text-xs text-slate-400">No messages yet. Start the conversation!</p>
                                     </div>
-                                    
-                                    <div class="bg-slate-50 rounded-2xl p-4 h-52 overflow-y-auto space-y-2 scrollbar-hide">
-                                        <div v-if="getMessages(selectedProfile.id).length === 0" class="text-center py-8">
-                                            <div class="text-3xl mb-2">💬</div>
-                                            <p class="text-xs text-slate-400">No messages yet. Start the conversation!</p>
-                                        </div>
-                                        <div v-for="msg in getMessages(selectedProfile.id)" :key="msg.timestamp" 
-                                             class="bg-white rounded-xl p-3 shadow-sm border border-slate-100 animate-slide-in">
-                                            <div class="flex justify-between text-xs font-bold">
+                                    <div v-for="msg in getMessages(selectedProfile.id)" :key="msg.timestamp" 
+                                         class="chat-message bg-white rounded-xl p-3 shadow-sm border border-slate-100 animate-slide-in">
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex items-center gap-2">
                                                 <span :class="msg.sender === selectedProfile.name ? 'text-green-600' : 'text-indigo-600'">
                                                     <i class="fas fa-user-circle mr-1"></i>{{ msg.sender || 'Anonymous' }}
                                                 </span>
-                                                <span class="text-slate-400 font-normal">{{ msg.time }}</span>
+                                                <span class="text-xs text-slate-400 font-normal">{{ msg.time }}</span>
                                             </div>
-                                            <p class="text-sm text-slate-700 mt-1">{{ msg.text }}</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-3">
-                                        <input 
-                                            type="text" 
-                                            v-model="visitorName"
-                                            placeholder="Your name..."
-                                            class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-2"
-                                        />
-                                        <div class="flex gap-2">
-                                            <input 
-                                                type="text" 
-                                                v-model="chatInput"
-                                                @keyup.enter="sendMessage(selectedProfile.id)"
-                                                placeholder="Type a message..."
-                                                class="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
-                                            />
-                                            <button @click="sendMessage(selectedProfile.id)"
-                                                    class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all">
-                                                <i class="fas fa-paper-plane"></i>
+                                            <button v-if="canDeleteMessage(msg)" 
+                                                    @click="deleteMessage(msg)" 
+                                                    class="text-red-400 hover:text-red-600 text-xs transition-colors ml-2">
+                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
+                                        <p class="text-sm text-slate-700 mt-1">{{ msg.text }}</p>
                                     </div>
                                 </div>
 
-                                <!-- Actions -->
-                                <div class="border-t pt-4 flex gap-2">
-                                    <button v-if="canEdit(selectedProfile)" @click="editProfile(selectedProfile)"
-                                            class="flex-1 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors text-sm font-medium">
-                                        <i class="fas fa-edit mr-1"></i>Edit
-                                    </button>
-                                    <button v-if="canDelete(selectedProfile)" @click="deleteProfile(selectedProfile.id)"
-                                            class="flex-1 px-4 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors text-sm font-medium">
-                                        <i class="fas fa-trash mr-1"></i>Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Add Profile Form -->
-                    <div v-else class="sticky top-28">
-                        <div class="glass-card rounded-3xl shadow-2xl p-6 border border-white/30">
-                            <div class="text-center mb-6">
-                                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-3xl mx-auto shadow-lg animate-float">
-                                    <i class="fas fa-plus text-white"></i>
-                                </div>
-                                <h3 class="text-xl font-bold text-slate-800 mt-4">Create Your Profile</h3>
-                                <p class="text-sm text-slate-400">Join the community of creators</p>
-                            </div>
-
-                            <form @submit.prevent="addProfile" class="space-y-3">
-                                <div class="relative">
-                                    <i class="fas fa-user absolute left-3 top-3 text-slate-400"></i>
+                                <div class="mt-3">
                                     <input 
                                         type="text" 
-                                        v-model="form.name"
-                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                                        placeholder="Full Name *"
-                                        required
-                                        :disabled="!currentUser"
+                                        v-model="visitorName"
+                                        placeholder="Your name..."
+                                        class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-2"
                                     />
-                                </div>
-                                
-                                <div class="relative">
-                                    <i class="fas fa-briefcase absolute left-3 top-3 text-slate-400"></i>
-                                    <input 
-                                        type="text" 
-                                        v-model="form.title"
-                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                                        placeholder="Headline *"
-                                        required
-                                        :disabled="!currentUser"
-                                    />
-                                </div>
-                                
-                                <div class="relative">
-                                    <i class="fas fa-align-left absolute left-3 top-3 text-slate-400"></i>
-                                    <textarea 
-                                        v-model="form.bio"
-                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm resize-none"
-                                        placeholder="Tell us about yourself..."
-                                        rows="3"
-                                        :disabled="!currentUser"
-                                    ></textarea>
-                                </div>
-
-                                <div>
-                                    <label class="text-xs font-medium text-slate-500 block mb-2">
-                                        <i class="fas fa-smile mr-1"></i>Choose Avatar
-                                    </label>
-                                    <div class="flex gap-1 flex-wrap">
-                                        <button v-for="e in avatars" :key="e" @click="form.avatar = e" type="button"
-                                                :class="['w-10 h-10 rounded-xl text-lg transition-all', 
-                                                         form.avatar === e ? 'bg-indigo-100 ring-2 ring-indigo-500 scale-110' : 'bg-slate-50 hover:bg-slate-100']"
-                                                :disabled="!currentUser">
-                                            {{ e }}
+                                    <div class="flex gap-2">
+                                        <input 
+                                            type="text" 
+                                            v-model="chatInput"
+                                            @keyup.enter="sendMessage(selectedProfile.id)"
+                                            placeholder="Type a message..."
+                                            class="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                                        />
+                                        <button @click="sendMessage(selectedProfile.id)"
+                                                class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all">
+                                            <i class="fas fa-paper-plane"></i>
                                         </button>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="space-y-2">
-                                    <div class="relative">
-                                        <i class="fas fa-envelope absolute left-3 top-3 text-slate-400"></i>
-                                        <input 
-                                            type="email" 
-                                            v-model="form.email"
-                                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                                            placeholder="Email"
-                                            :disabled="!currentUser"
-                                        />
-                                    </div>
-                                    <div class="relative">
-                                        <i class="fab fa-whatsapp absolute left-3 top-3 text-slate-400"></i>
-                                        <input 
-                                            type="text" 
-                                            v-model="form.whatsapp"
-                                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                                            placeholder="WhatsApp"
-                                            :disabled="!currentUser"
-                                        />
-                                    </div>
-                                    <div class="relative">
-                                        <i class="fab fa-instagram absolute left-3 top-3 text-slate-400"></i>
-                                        <input 
-                                            type="text" 
-                                            v-model="form.instagram"
-                                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                                            placeholder="Instagram"
-                                            :disabled="!currentUser"
-                                        />
-                                    </div>
-                                </div>
-
-                                <button type="submit" 
-                                        :disabled="!currentUser"
-                                        class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <i class="fas fa-rocket mr-2"></i>
-                                    {{ currentUser ? 'Launch Profile 🚀' : '🔒 Login to Create' }}
+                            <!-- Actions -->
+                            <div class="border-t pt-4 flex gap-2">
+                                <button v-if="canEdit(selectedProfile)" @click="editProfile(selectedProfile)"
+                                        class="flex-1 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors text-sm font-medium">
+                                    <i class="fas fa-edit mr-1"></i>Edit
                                 </button>
-                            </form>
+                                <button v-if="canDelete(selectedProfile)" @click="deleteProfile(selectedProfile.id)"
+                                        class="flex-1 px-4 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors text-sm font-medium">
+                                    <i class="fas fa-trash mr-1"></i>Delete
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Add Profile Form -->
+                <div v-else class="sticky top-28">
+                    <div class="glass-card rounded-3xl shadow-2xl p-6 border border-white/30">
+                        <div class="text-center mb-6">
+                            <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-3xl mx-auto shadow-lg animate-float">
+                                <i class="fas fa-plus text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-slate-800 mt-4">Create Your Profile</h3>
+                            <p class="text-sm text-slate-400">Join the community of creators</p>
+                        </div>
+
+                        <form @submit.prevent="addProfile" class="space-y-3">
+                            <div class="relative">
+                                <i class="fas fa-user absolute left-3 top-3 text-slate-400"></i>
+                                <input 
+                                    type="text" 
+                                    v-model="form.name"
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                    placeholder="Full Name *"
+                                    required
+                                    :disabled="!currentUser"
+                                />
+                            </div>
+                            
+                            <div class="relative">
+                                <i class="fas fa-briefcase absolute left-3 top-3 text-slate-400"></i>
+                                <input 
+                                    type="text" 
+                                    v-model="form.title"
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                    placeholder="Headline *"
+                                    required
+                                    :disabled="!currentUser"
+                                />
+                            </div>
+                            
+                            <div class="relative">
+                                <i class="fas fa-align-left absolute left-3 top-3 text-slate-400"></i>
+                                <textarea 
+                                    v-model="form.bio"
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm resize-none"
+                                    placeholder="Tell us about yourself..."
+                                    rows="3"
+                                    :disabled="!currentUser"
+                                ></textarea>
+                            </div>
+
+                            <div>
+                                <label class="text-xs font-medium text-slate-500 block mb-2">
+                                    <i class="fas fa-smile mr-1"></i>Choose Avatar
+                                </label>
+                                <div class="flex gap-1 flex-wrap">
+                                    <button v-for="e in avatars" :key="e" @click="form.avatar = e" type="button"
+                                            :class="['w-10 h-10 rounded-xl text-lg transition-all', 
+                                                     form.avatar === e ? 'bg-indigo-100 ring-2 ring-indigo-500 scale-110' : 'bg-slate-50 hover:bg-slate-100']"
+                                            :disabled="!currentUser">
+                                        {{ e }}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="relative">
+                                    <i class="fas fa-envelope absolute left-3 top-3 text-slate-400"></i>
+                                    <input 
+                                        type="email" 
+                                        v-model="form.email"
+                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                        placeholder="Email"
+                                        :disabled="!currentUser"
+                                    />
+                                </div>
+                                <div class="relative">
+                                    <i class="fab fa-whatsapp absolute left-3 top-3 text-slate-400"></i>
+                                    <input 
+                                        type="text" 
+                                        v-model="form.whatsapp"
+                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                        placeholder="WhatsApp"
+                                        :disabled="!currentUser"
+                                    />
+                                </div>
+                                <div class="relative">
+                                    <i class="fab fa-instagram absolute left-3 top-3 text-slate-400"></i>
+                                    <input 
+                                        type="text" 
+                                        v-model="form.instagram"
+                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                        placeholder="Instagram"
+                                        :disabled="!currentUser"
+                                    />
+                                </div>
+                            </div>
+
+                            <button type="submit" 
+                                    :disabled="!currentUser"
+                                    class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                                <i class="fas fa-rocket mr-2"></i>
+                                {{ currentUser ? 'Launch Profile 🚀' : '🔒 Login to Create' }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!-- LOGIN MODAL -->
-        <div v-if="showLogin" class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4" @click.self="showLogin = false">
-            <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 transform transition-all animate-slide-in">
-                <div class="text-center mb-6">
-                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-3xl mx-auto shadow-lg animate-float">
-                        <i class="fas fa-lock text-white"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-slate-800 mt-4">Welcome Back</h2>
-                    <p class="text-sm text-slate-400">Sign in to manage your portfolio</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <input 
-                        type="email" 
-                        v-model="loginEmail"
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                        placeholder="Email address"
-                    />
-                    <input 
-                        type="password" 
-                        v-model="loginPassword"
-                        @keyup.enter="loginUser"
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                        placeholder="Password"
-                    />
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" v-model="isSignup" class="rounded border-slate-300 text-indigo-600" />
-                        <label class="text-sm text-slate-600">Create new account</label>
-                    </div>
-                    <button @click="loginUser" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
-                        <i class="fas fa-sign-in-alt mr-2"></i>
-                        {{ isSignup ? 'Create Account' : 'Sign In' }}
-                    </button>
-                    <button @click="showLogin = false" class="w-full py-2 text-sm text-slate-400 hover:text-slate-600 transition-colors">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- DEVELOPER MODAL -->
-        <div v-if="showDev" class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4" @click.self="showDev = false">
-            <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 transform transition-all animate-slide-in">
-                <div class="text-center mb-6">
-                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-3xl mx-auto shadow-lg animate-float">
-                        <i class="fas fa-code text-white"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-slate-800 mt-4">Developer Mode</h2>
-                    <p class="text-sm text-slate-400">Enter the secret code to unlock admin powers</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <input 
-                        type="password" 
-                        v-model="devCodeInput"
-                        @keyup.enter="activateDevMode"
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-sm font-mono"
-                        placeholder="Enter developer code..."
-                    />
-                    <button @click="activateDevMode" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
-                        <i class="fas fa-unlock mr-2"></i>
-                        Activate Developer Mode
-                    </button>
-                    <button @click="showDev = false" class="w-full py-2 text-sm text-slate-400 hover:text-slate-600 transition-colors">
-                        Cancel
-                    </button>
-                    <p v-if="devStatus" class="text-sm text-center font-medium" :class="devStatus.includes('✅') ? 'text-green-600' : 'text-red-600'">
-                        {{ devStatus }}
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="mt-12 border-t border-slate-200/50 py-8">
-            <div class="max-w-7xl mx-auto px-6 flex flex-wrap justify-between items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-xl">🌟</span>
-                    <span class="font-bold gradient-text">PortfoliOasis</span>
-                    <span class="text-xs text-slate-400">© 2024</span>
-                </div>
-                <div class="flex gap-6 text-sm text-slate-400">
-                    <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-github mr-1"></i>GitHub</a>
-                    <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-twitter mr-1"></i>Twitter</a>
-                    <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-linkedin mr-1"></i>LinkedIn</a>
-                </div>
-                <div class="text-xs text-slate-400">
-                    🔑 Secret code: <code style="background:rgba(0,0,0,0.05);padding:2px 12px;border-radius:6px;font-family:'Courier New',monospace;color:#6366f1;font-weight:bold;">VERIFY2026</code>
-                </div>
-            </div>
-        </footer>
     </div>
 
-    <script>
-        const { createApp, ref, computed, onMounted } = Vue;
+    <!-- LOGIN MODAL -->
+    <div v-if="showLogin" class="fixed inset-0 modal-overlay flex items-center justify-center z-50 p-4" @click.self="showLogin = false">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 transform transition-all animate-slide-in">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-3xl mx-auto shadow-lg animate-float">
+                    <i class="fas fa-lock text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 mt-4">Welcome Back</h2>
+                <p class="text-sm text-slate-400">Sign in to manage your portfolio</p>
+            </div>
+            
+            <div class="space-y-4">
+                <input 
+                    type="email" 
+                    v-model="loginEmail"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                    placeholder="Email address"
+                />
+                <input 
+                    type="password" 
+                    v-model="loginPassword"
+                    @keyup.enter="loginUser"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                    placeholder="Password"
+                />
+                <div class="flex items-center gap-2">
+                    <input type="checkbox" v-model="isSignup" class="rounded border-slate-300 text-indigo-600" />
+                    <label class="text-sm text-slate-600">Create new account</label>
+                </div>
+                <button @click="loginUser" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    {{ isSignup ? 'Create Account' : 'Sign In' }}
+                </button>
+                <button @click="showLogin = false" class="w-full py-2 text-sm text-slate-400 hover:text-slate-600 transition-colors">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
 
-        // ============================================================
-        // YOUR JSONBIN CREDENTIALS
-        // ============================================================
-        const BIN_ID = '6a4e1171da38895dfe3f5885';
-        const API_KEY = '$2a$10$9H5oG80cnlBePFC2af5G5edtOsIn6o2YDVdFws9VDqImy8Vnuf4PO';
-        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-        // ============================================================
+    <!-- DEVELOPER MODAL -->
+    <div v-if="showDev" class="fixed inset-0 modal-overlay flex items-center justify-center z-50 p-4" @click.self="showDev = false">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 transform transition-all animate-slide-in">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-3xl mx-auto shadow-lg animate-float">
+                    <i class="fas fa-code text-white"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 mt-4">Developer Mode</h2>
+                <p class="text-sm text-slate-400">Enter the secret code to unlock admin powers</p>
+            </div>
+            
+            <div class="space-y-4">
+                <input 
+                    type="password" 
+                    v-model="devCodeInput"
+                    @keyup.enter="activateDevMode"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-sm font-mono"
+                    placeholder="Enter developer code..."
+                />
+                <button @click="activateDevMode" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
+                    <i class="fas fa-unlock mr-2"></i>
+                    Activate Developer Mode
+                </button>
+                <button @click="showDev = false" class="w-full py-2 text-sm text-slate-400 hover:text-slate-600 transition-colors">
+                    Cancel
+                </button>
+                <p v-if="devStatus" class="text-sm text-center font-medium" :class="devStatus.includes('✅') ? 'text-green-600' : 'text-red-600'">
+                    {{ devStatus }}
+                </p>
+            </div>
+        </div>
+    </div>
 
-        // 🔑 THE SECRET CODES
-        const SECRET_CODE = 'VERIFY2026';
-        const DEV_SECRET_CODE = 'PortfoliOasis2024!@#';
+    <!-- Footer -->
+    <footer class="mt-12 border-t border-slate-200/50 py-8">
+        <div class="max-w-7xl mx-auto px-6 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="text-xl">🌟</span>
+                <span class="font-bold gradient-text">PortfoliOasis</span>
+                <span class="text-xs text-slate-400">© 2024</span>
+            </div>
+            <div class="flex gap-6 text-sm text-slate-400">
+                <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-github mr-1"></i>GitHub</a>
+                <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-twitter mr-1"></i>Twitter</a>
+                <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-linkedin mr-1"></i>LinkedIn</a>
+            </div>
+            <div class="text-xs text-slate-400">
+                🔑 Secret code: <code style="background:rgba(0,0,0,0.05);padding:2px 12px;border-radius:6px;font-family:'Courier New',monospace;color:#6366f1;font-weight:bold;">VERIFY2026</code>
+            </div>
+        </div>
+    </footer>
+</div>
 
-        // 🚫 PROFANITY LIST
-        const PROFANITY_LIST = ['fuck', 'shit', 'asshole', 'bitch', 'cunt', 'dick', 'pussy', 'bastard', 'whore', 'slut', 'damn', 'hell', 'crap', 'stupid', 'idiot', 'moron'];
+<script>
+    const { createApp, ref, computed, onMounted } = Vue;
 
-        // 📦 SAMPLE PROFILES
-        const SAMPLE_PROFILES = [
-            {
-                id: '1001',
-                name: 'Sarah Johnson',
-                title: 'Full Stack Developer',
-                bio: 'Building web applications with React, Node.js, and AWS. 5+ years of experience.',
-                avatar: '💻',
-                email: 'sarah@example.com',
-                whatsapp: '1234567890',
-                instagram: 'sarahdev',
-                owner: 'sarah@example.com',
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '1002',
-                name: 'Mike Chen',
-                title: 'UI/UX Designer',
-                bio: 'Creating beautiful and functional designs with Figma and Adobe XD.',
-                avatar: '🎨',
-                email: 'mike@example.com',
-                whatsapp: '',
-                instagram: 'mikedesigned',
-                owner: 'mike@example.com',
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '1003',
-                name: 'Aisha Patel',
-                title: 'Blockchain Developer',
-                bio: 'Specializing in Ethereum, Solidity, and DeFi applications.',
-                avatar: '⛓️',
-                email: 'aisha@example.com',
-                whatsapp: '9876543210',
-                instagram: 'aishablockchain',
-                owner: 'aisha@example.com',
-                createdAt: new Date().toISOString()
+    // ============================================================
+    // YOUR JSONBIN CREDENTIALS
+    // ============================================================
+    const BIN_ID = '6a4e1171da38895dfe3f5885';
+    const API_KEY = '$2a$10$9H5oG80cnlBePFC2af5G5edtOsIn6o2YDVdFws9VDqImy8Vnuf4PO';
+    const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+    // ============================================================
+
+    // 🔑 THE SECRET CODES
+    const SECRET_CODE = 'VERIFY2026';
+    const DEV_SECRET_CODE = 'PortfoliOasis2024!@#';
+
+    // 🚫 PROFANITY LIST
+    const PROFANITY_LIST = ['fuck', 'shit', 'asshole', 'bitch', 'cunt', 'dick', 'pussy', 'bastard', 'whore', 'slut', 'damn', 'hell', 'crap', 'stupid', 'idiot', 'moron'];
+
+    // 📦 SAMPLE PROFILES
+    const SAMPLE_PROFILES = [
+        {
+            id: '1001',
+            name: 'Sarah Johnson',
+            title: 'Full Stack Developer',
+            bio: 'Building web applications with React, Node.js, and AWS. 5+ years of experience.',
+            avatar: '💻',
+            email: 'sarah@example.com',
+            whatsapp: '1234567890',
+            instagram: 'sarahdev',
+            owner: 'sarah@example.com',
+            createdAt: new Date().toISOString(),
+            likes: 12,
+            dislikes: 3
+        },
+        {
+            id: '1002',
+            name: 'Mike Chen',
+            title: 'UI/UX Designer',
+            bio: 'Creating beautiful and functional designs with Figma and Adobe XD.',
+            avatar: '🎨',
+            email: 'mike@example.com',
+            whatsapp: '',
+            instagram: 'mikedesigned',
+            owner: 'mike@example.com',
+            createdAt: new Date().toISOString(),
+            likes: 8,
+            dislikes: 1
+        },
+        {
+            id: '1003',
+            name: 'Aisha Patel',
+            title: 'Blockchain Developer',
+            bio: 'Specializing in Ethereum, Solidity, and DeFi applications.',
+            avatar: '⛓️',
+            email: 'aisha@example.com',
+            whatsapp: '9876543210',
+            instagram: 'aishablockchain',
+            owner: 'aisha@example.com',
+            createdAt: new Date().toISOString(),
+            likes: 15,
+            dislikes: 2
+        }
+    ];
+
+    createApp({
+        setup() {
+            const searchQuery = ref('');
+            const selectedProfile = ref(null);
+            const chatInput = ref('');
+            const visitorName = ref('');
+            const showDropdown = ref(false);
+            
+            // Data
+            const profiles = ref([]);
+            const messages = ref([]);
+            
+            // Auth
+            const currentUser = ref(null);
+            const showLogin = ref(false);
+            const showDev = ref(false);
+            const loginEmail = ref('');
+            const loginPassword = ref('');
+            const isSignup = ref(false);
+            const devCodeInput = ref('');
+            const devStatus = ref('');
+            const isDev = ref(false);
+
+            // Developer Dashboard
+            const showDevDashboard = ref(false);
+
+            // Secret Code
+            const secretCodeInput = ref('');
+            const isVerified = ref(false);
+            const codeMessageText = ref('🔑 Enter the secret code to get verified');
+            const codeMessageClass = ref('info');
+
+            // Toast
+            const toast = ref({
+                show: false,
+                message: '',
+                type: 'info',
+                time: ''
+            });
+
+            // Form
+            const form = ref({ 
+                name: '', 
+                title: '', 
+                bio: '', 
+                email: '', 
+                whatsapp: '', 
+                instagram: '',
+                avatar: '🚀'
+            });
+
+            const avatars = ['🚀', '💻', '🎨', '📊', '🧠', '⚡', '🌟', '🎯', '👩‍💻', '👨‍💻', '📸', '💼', '🦄', '🔥', '✨', '🎮'];
+
+            // NEWS
+            const newsItems = ref([]);
+            const showNewsModal = ref(false);
+            const newsTitle = ref('');
+            const newsBody = ref('');
+            const newNotification = ref(false);
+            const unreadNewsCount = computed(() => newsItems.value.length);
+
+            // Computed
+            const filteredProfiles = computed(() => {
+                if (!searchQuery.value) return profiles.value;
+                const q = searchQuery.value.toLowerCase();
+                return profiles.value.filter(p => 
+                    p.name.toLowerCase().includes(q) || 
+                    p.title.toLowerCase().includes(q) ||
+                    p.bio.toLowerCase().includes(q)
+                );
+            });
+
+            // Toast helper
+            function showToast(message, type = 'info') {
+                toast.value = {
+                    show: true,
+                    message: message,
+                    type: type,
+                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                };
+                setTimeout(() => { toast.value.show = false; }, 4000);
             }
-        ];
 
-        createApp({
-            setup() {
-                const searchQuery = ref('');
-                const selectedProfile = ref(null);
-                const chatInput = ref('');
-                const visitorName = ref('');
-                const showDropdown = ref(false);
-                
-                // Data
-                const profiles = ref([]);
-                const messages = ref([]);
-                
-                // Auth
-                const currentUser = ref(null);
-                const showLogin = ref(false);
-                const showDev = ref(false);
-                const loginEmail = ref('');
-                const loginPassword = ref('');
-                const isSignup = ref(false);
-                const devCodeInput = ref('');
-                const devStatus = ref('');
-                const isDev = ref(false);
+            // Permissions
+            const canEdit = (profile) => {
+                if (isDev.value) return true;
+                if (!currentUser.value) return false;
+                return profile.owner === currentUser.value.email;
+            };
 
-                // Developer Dashboard
-                const showDevDashboard = ref(false);
+            const canDelete = (profile) => {
+                if (isDev.value) return true;
+                if (!currentUser.value) return false;
+                return profile.owner === currentUser.value.email;
+            };
 
-                // Secret Code
-                const secretCodeInput = ref('');
-                const isVerified = ref(false);
-                const codeMessageText = ref('🔑 Enter the secret code to get verified');
-                const codeMessageClass = ref('info');
-
-                // Form
-                const form = ref({ 
-                    name: '', 
-                    title: '', 
-                    bio: '', 
-                    email: '', 
-                    whatsapp: '', 
-                    instagram: '',
-                    avatar: '🚀'
-                });
-
-                const avatars = ['🚀', '💻', '🎨', '📊', '🧠', '⚡', '🌟', '🎯', '👩‍💻', '👨‍💻', '📸', '💼', '🦄', '🔥', '✨', '🎮'];
-
-                // Computed
-                const filteredProfiles = computed(() => {
-                    if (!searchQuery.value) return profiles.value;
-                    const q = searchQuery.value.toLowerCase();
-                    return profiles.value.filter(p => 
-                        p.name.toLowerCase().includes(q) || 
-                        p.title.toLowerCase().includes(q) ||
-                        p.bio.toLowerCase().includes(q)
-                    );
-                });
-
-                // Permissions
-                const canEdit = (profile) => {
-                    if (isDev.value) return true;
-                    if (!currentUser.value) return false;
-                    return profile.owner === currentUser.value.email;
-                };
-
-                const canDelete = (profile) => {
-                    if (isDev.value) return true;
-                    if (!currentUser.value) return false;
-                    return profile.owner === currentUser.value.email;
-                };
-
-                // Get All Users from localStorage
-                function getAllUsers() {
-                    try {
-                        const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
-                        return users;
-                    } catch {
-                        return {};
-                    }
-                }
-
-                // Copy Password
-                function copyPassword(password) {
-                    navigator.clipboard.writeText(password).then(() => {
-                        alert('✅ Password copied to clipboard!');
-                    }).catch(() => {
-                        alert('📋 Password: ' + password);
-                    });
-                }
-
-                // Delete User Account
-                function deleteUserAccount(email) {
-                    if (!confirm(`⚠️ Delete user "${email}"? This cannot be undone!`)) return;
-                    
+            // Get All Users from localStorage
+            function getAllUsers() {
+                try {
                     const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
-                    delete users[email];
-                    localStorage.setItem('portfolio_users', JSON.stringify(users));
-                    
-                    // Also delete their profile
-                    profiles.value = profiles.value.filter(p => p.owner !== email);
-                    
-                    alert(`✅ User "${email}" deleted!`);
+                    return users;
+                } catch {
+                    return {};
                 }
+            }
 
-                // Export User Data
-                function exportUserData() {
-                    const users = getAllUsers();
-                    const data = {
-                        exportedAt: new Date().toISOString(),
-                        totalUsers: Object.keys(users).length,
-                        users: users
-                    };
-                    
-                    const json = JSON.stringify(data, null, 2);
-                    const blob = new Blob([json], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `users_export_${Date.now()}.json`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                }
+            // Copy Password
+            function copyPassword(password) {
+                navigator.clipboard.writeText(password).then(() => {
+                    showToast('✅ Password copied to clipboard!', 'success');
+                }).catch(() => {
+                    showToast('📋 Password: ' + password, 'info');
+                });
+            }
 
-                // Secret Code Verification
-                function verifyCode() {
-                    const entered = secretCodeInput.value.trim();
+            // Delete User Account
+            function deleteUserAccount(email) {
+                if (!confirm(`⚠️ Delete user "${email}"? This cannot be undone!`)) return;
+                
+                const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                delete users[email];
+                localStorage.setItem('portfolio_users', JSON.stringify(users));
+                
+                profiles.value = profiles.value.filter(p => p.owner !== email);
+                
+                showToast(`✅ User "${email}" deleted!`, 'success');
+            }
 
-                    if (!entered) {
-                        codeMessageClass.value = 'info';
-                        codeMessageText.value = '🔑 Enter the secret code to get verified';
-                        return;
-                    }
-
-                    if (entered === SECRET_CODE) {
-                        isVerified.value = true;
-                        codeMessageClass.value = 'success';
-                        codeMessageText.value = '✅ Verified! Your badge has been unlocked. 🎉';
-                        localStorage.setItem('verified', 'true');
-                        localStorage.setItem('codeUsed', entered);
-                    } else {
-                        isVerified.value = false;
-                        codeMessageClass.value = 'error';
-                        codeMessageText.value = '❌ Invalid code. Try again.';
-                        localStorage.removeItem('verified');
-                        localStorage.removeItem('codeUsed');
-                    }
-                }
-
-                // Load saved verification
-                function loadSavedVerification() {
-                    const saved = localStorage.getItem('verified');
-                    const savedCode = localStorage.getItem('codeUsed');
-
-                    if (saved === 'true' && savedCode === SECRET_CODE) {
-                        isVerified.value = true;
-                        secretCodeInput.value = savedCode;
-                        codeMessageClass.value = 'success';
-                        codeMessageText.value = '✅ Previously verified! Badge restored. 🎉';
-                    }
-                }
-
-                // Profanity Filter
-                const filterProfanity = (text) => {
-                    if (!text) return text;
-                    let filtered = text;
-                    PROFANITY_LIST.forEach(word => {
-                        filtered = filtered.replace(new RegExp(word, 'gi'), '****');
-                    });
-                    return filtered;
+            // Export User Data
+            function exportUserData() {
+                const users = getAllUsers();
+                const data = {
+                    exportedAt: new Date().toISOString(),
+                    totalUsers: Object.keys(users).length,
+                    users: users
                 };
+                
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `users_export_${Date.now()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('✅ Data exported successfully!', 'success');
+            }
 
-                // Load Data
-                async function loadData() {
-                    try {
-                        console.log('📡 Loading data...');
-                        
-                        const response = await fetch(`${API_URL}/latest`, {
-                            headers: { 'X-Master-Key': API_KEY }
-                        });
-                        
-                        if (response.ok) {
-                            const data = await response.json();
-                            if (data.record && data.record.profiles && data.record.profiles.length > 0) {
-                                profiles.value = data.record.profiles;
-                                messages.value = data.record.messages || [];
-                                console.log('✅ Loaded from JSONBin:', profiles.value.length, 'profiles');
-                                return;
-                            }
-                        }
-                        
-                        console.log('📦 Using sample data');
-                        profiles.value = [...SAMPLE_PROFILES];
-                        messages.value = [];
-                        
-                    } catch (error) {
-                        console.error('❌ Error:', error);
-                        profiles.value = [...SAMPLE_PROFILES];
-                        messages.value = [];
-                    }
+            // Secret Code Verification
+            function verifyCode() {
+                const entered = secretCodeInput.value.trim();
+
+                if (!entered) {
+                    codeMessageClass.value = 'info';
+                    codeMessageText.value = '🔑 Enter the secret code to get verified';
+                    return;
                 }
 
-                // Save Data
-                async function saveData() {
-                    try {
-                        const data = { 
-                            profiles: profiles.value, 
-                            messages: messages.value 
-                        };
-                        await fetch(API_URL, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-Master-Key': API_KEY
-                            },
-                            body: JSON.stringify(data)
-                        });
-                        console.log('✅ Data saved');
-                    } catch (error) {
-                        console.error('❌ Save error:', error);
-                    }
+                if (entered === SECRET_CODE) {
+                    isVerified.value = true;
+                    codeMessageClass.value = 'success';
+                    codeMessageText.value = '✅ Verified! Your badge has been unlocked. 🎉';
+                    localStorage.setItem('verified', 'true');
+                    localStorage.setItem('codeUsed', entered);
+                    showToast('✅ Verified badge unlocked! 🎉', 'success');
+                } else {
+                    isVerified.value = false;
+                    codeMessageClass.value = 'error';
+                    codeMessageText.value = '❌ Invalid code. Try again.';
+                    localStorage.removeItem('verified');
+                    localStorage.removeItem('codeUsed');
+                    showToast('❌ Invalid secret code', 'error');
                 }
+            }
 
-                // Select Profile
-                function selectProfile(profile) {
-                    selectedProfile.value = profile;
+            // Load saved verification
+            function loadSavedVerification() {
+                const saved = localStorage.getItem('verified');
+                const savedCode = localStorage.getItem('codeUsed');
+
+                if (saved === 'true' && savedCode === SECRET_CODE) {
+                    isVerified.value = true;
+                    secretCodeInput.value = savedCode;
+                    codeMessageClass.value = 'success';
+                    codeMessageText.value = '✅ Previously verified! Badge restored. 🎉';
                 }
+            }
 
-                // Add Profile
-                async function addProfile() {
-                    if (!currentUser.value) {
-                        alert('Please login first');
-                        return;
-                    }
+            // Profanity Filter
+            const filterProfanity = (text) => {
+                if (!text) return text;
+                let filtered = text;
+                PROFANITY_LIST.forEach(word => {
+                    filtered = filtered.replace(new RegExp(word, 'gi'), '****');
+                });
+                return filtered;
+            };
 
-                    if (!form.value.name || !form.value.title) {
-                        alert('Name and Headline are required');
-                        return;
-                    }
-
-                    const existing = profiles.value.find(p => p.owner === currentUser.value.email);
-                    if (existing) {
-                        alert('You already have a portfolio! You can edit it instead.');
-                        return;
-                    }
-
-                    const newProfile = {
-                        id: Date.now().toString().slice(-6),
-                        name: form.value.name.trim(),
-                        title: form.value.title.trim(),
-                        bio: filterProfanity(form.value.bio.trim()) || 'No biography provided.',
-                        avatar: form.value.avatar || '🚀',
-                        email: form.value.email || '',
-                        whatsapp: form.value.whatsapp || '',
-                        instagram: form.value.instagram || '',
-                        owner: currentUser.value.email,
-                        createdAt: new Date().toISOString()
-                    };
-
-                    profiles.value.unshift(newProfile);
-                    await saveData();
-                    
-                    form.value = { name: '', title: '', bio: '', email: '', whatsapp: '', instagram: '', avatar: '🚀' };
-                    alert('✅ Your profile has been published! 🎉');
+            // NEWS functions
+            function loadNews() {
+                try {
+                    const saved = JSON.parse(localStorage.getItem('portfolio_news') || '[]');
+                    newsItems.value = saved;
+                } catch { 
+                    newsItems.value = []; 
                 }
+            }
 
-                // Delete Profile
-                async function deleteProfile(id) {
-                    const profile = profiles.value.find(p => p.id === id);
-                    if (!profile) return;
-                    
-                    if (!canDelete(profile)) {
-                        alert('❌ You can only delete your own profile!');
-                        return;
-                    }
-                    
-                    if (!confirm(`Delete "${profile.name}"'s profile?`)) return;
-                    
-                    profiles.value = profiles.value.filter(p => p.id !== id);
-                    messages.value = messages.value.filter(m => m.profileId !== id);
-                    await saveData();
-                    selectedProfile.value = null;
-                    alert('✅ Profile deleted');
+            function saveNews() {
+                localStorage.setItem('portfolio_news', JSON.stringify(newsItems.value));
+            }
+
+            function addNewsItem() {
+                if (!isDev.value) {
+                    showToast('❌ Only developers can add news', 'error');
+                    return;
                 }
-
-                // Edit Profile
-                function editProfile(profile) {
-                    if (!canEdit(profile)) {
-                        alert('❌ You can only edit your own profile!');
-                        return;
-                    }
-                    
-                    const newName = prompt('Edit name:', profile.name);
-                    if (newName) profile.name = newName.trim();
-                    
-                    const newTitle = prompt('Edit title:', profile.title);
-                    if (newTitle) profile.title = newTitle.trim();
-                    
-                    const newBio = prompt('Edit bio:', profile.bio);
-                    if (newBio) profile.bio = filterProfanity(newBio.trim());
-                    
-                    const newAvatar = prompt('Choose avatar (emoji):', profile.avatar);
-                    if (newAvatar && newAvatar.length <= 2) profile.avatar = newAvatar;
-                    
-                    saveData();
-                    alert('✅ Profile updated!');
+                if (!newsTitle.value.trim() || !newsBody.value.trim()) {
+                    showToast('⚠️ Please enter both title and body', 'error');
+                    return;
                 }
+                const now = new Date();
+                newsItems.value.unshift({
+                    title: newsTitle.value.trim(),
+                    body: newsBody.value.trim(),
+                    time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    fromDev: true,
+                    author: currentUser.value?.email || 'dev'
+                });
+                newNotification.value = true;
+                setTimeout(() => newNotification.value = false, 3000);
+                saveNews();
+                newsTitle.value = '';
+                newsBody.value = '';
+                showToast('📰 News added successfully!', 'success');
+                // Play bell sound
+                try {
+                    const audio = new Audio('data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAABUZWxlZm9uZQAA');
+                    audio.play().catch(() => {});
+                } catch(e) {}
+            }
 
-                // Messages
-                function getMessages(profileId) {
-                    return messages.value.filter(m => m.profileId === profileId);
+            function deleteNewsItem(idx) {
+                if (!isDev.value && !(currentUser.value && newsItems.value[idx].author === currentUser.value.email)) {
+                    showToast('❌ You can only delete your own news', 'error');
+                    return;
                 }
+                newsItems.value.splice(idx, 1);
+                saveNews();
+                showToast('🗑️ News deleted', 'info');
+            }
 
-                async function sendMessage(profileId) {
-                    if (!chatInput.value.trim()) return;
-                    
-                    const now = new Date();
-                    const msg = {
-                        profileId: profileId,
-                        text: filterProfanity(chatInput.value.trim()),
-                        time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        timestamp: now.getTime(),
-                        sender: visitorName.value.trim() || 'Anonymous'
-                    };
-                    
-                    messages.value.push(msg);
-                    chatInput.value = '';
-                    await saveData();
+            function toggleNewsModal() {
+                showNewsModal.value = !showNewsModal.value;
+                if (showNewsModal.value) {
+                    // Mark as read
+                    newNotification.value = false;
                 }
+            }
 
-                // Auth
-                async function loginUser() {
-                    if (!loginEmail.value || !loginPassword.value) {
-                        alert('Please enter email and password');
-                        return;
-                    }
-
-                    const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
-
-                    if (isSignup.value) {
-                        if (users[loginEmail.value]) {
-                            alert('Account already exists');
+            // Load Data
+            async function loadData() {
+                try {
+                    const response = await fetch(`${API_URL}/latest`, {
+                        headers: { 'X-Master-Key': API_KEY }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.record && data.record.profiles && data.record.profiles.length > 0) {
+                            profiles.value = data.record.profiles;
+                            messages.value = data.record.messages || [];
                             return;
                         }
-                        users[loginEmail.value] = { 
-                            password: loginPassword.value, 
-                            name: loginEmail.value.split('@')[0] 
-                        };
-                        localStorage.setItem('portfolio_users', JSON.stringify(users));
-                        alert('✅ Account created! Please login.');
-                        isSignup.value = false;
-                        return;
                     }
-
-                    if (!users[loginEmail.value] || users[loginEmail.value].password !== loginPassword.value) {
-                        alert('❌ Invalid credentials');
-                        return;
-                    }
-
-                    currentUser.value = {
-                        email: loginEmail.value,
-                        name: users[loginEmail.value].name || loginEmail.value.split('@')[0]
-                    };
                     
-                    showLogin.value = false;
-                    loginEmail.value = '';
-                    loginPassword.value = '';
-                    alert(`✅ Welcome ${currentUser.value.name}! 🎉`);
+                    profiles.value = [...SAMPLE_PROFILES];
+                    messages.value = [];
+                    
+                } catch (error) {
+                    profiles.value = [...SAMPLE_PROFILES];
+                    messages.value = [];
                 }
-
-                function logout() {
-                    currentUser.value = null;
-                    isDev.value = false;
-                    showDevDashboard.value = false;
-                    alert('👋 Logged out successfully');
-                }
-
-                // Dev Mode
-                function activateDevMode() {
-                    if (devCodeInput.value === DEV_SECRET_CODE) {
-                        isDev.value = true;
-                        devStatus.value = '✅ Developer mode activated!';
-                        setTimeout(() => {
-                            showDev.value = false;
-                            devCodeInput.value = '';
-                            devStatus.value = '';
-                        }, 1500);
-                        alert('🔓 Developer mode activated! You can now:\n• Edit/delete any profile\n• View all user accounts & passwords');
-                    } else {
-                        devStatus.value = '❌ Invalid developer code';
-                        setTimeout(() => { devStatus.value = ''; }, 3000);
-                    }
-                }
-
-                // Auto-refresh
-                let refreshInterval = null;
-
-                onMounted(() => {
-                    loadData();
-                    loadSavedVerification();
-                    refreshInterval = setInterval(() => {
-                        if (selectedProfile.value) {
-                            loadData();
-                        }
-                    }, 30000);
-                });
-
-                return {
-                    searchQuery,
-                    selectedProfile,
-                    chatInput,
-                    visitorName,
-                    showDropdown,
-                    profiles,
-                    messages,
-                    currentUser,
-                    showLogin,
-                    showDev,
-                    loginEmail,
-                    loginPassword,
-                    isSignup,
-                    devCodeInput,
-                    devStatus,
-                    isDev,
-                    showDevDashboard,
-                    form,
-                    avatars,
-                    filteredProfiles,
-                    canEdit,
-                    canDelete,
-                    selectProfile,
-                    addProfile,
-                    deleteProfile,
-                    editProfile,
-                    getMessages,
-                    sendMessage,
-                    loginUser,
-                    logout,
-                    activateDevMode,
-                    secretCodeInput,
-                    isVerified,
-                    codeMessageText,
-                    codeMessageClass,
-                    verifyCode,
-                    getAllUsers,
-                    copyPassword,
-                    deleteUserAccount,
-                    exportUserData
-                };
             }
-        }).mount('#app');
-    </script>
+
+            // Save Data
+            async function saveData() {
+                try {
+                    const data = { 
+                        profiles: profiles.value, 
+                        messages: messages.value 
+                    };
+                    await fetch(API_URL, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': API_KEY
+                        },
+                        body: JSON.stringify(data)
+                    });
+                } catch (error) {
+                    console.error('Save error:', error);
+                }
+            }
+
+            // Select Profile
+            function selectProfile(profile) {
+                selectedProfile.value = profile;
+            }
+
+            // Add Profile
+            async function addProfile() {
+                if (!currentUser.value) {
+                    showToast('Please login first', 'error');
+                    return;
+                }
+
+                if (!form.value.name || !form.value.title) {
+                    showToast('Name and Headline are required', 'error');
+                    return;
+                }
+
+                const existing = profiles.value.find(p => p.owner === currentUser.value.email);
+                if (existing) {
+                    showToast('You already have a portfolio! You can edit it instead.', 'info');
+                    return;
+                }
+
+                const newProfile = {
+                    id: Date.now().toString().slice(-6),
+                    name: form.value.name.trim(),
+                    title: form.value.title.trim(),
+                    bio: filterProfanity(form.value.bio.trim()) || 'No biography provided.',
+                    avatar: form.value.avatar || '🚀',
+                    email: form.value.email || '',
+                    whatsapp: form.value.whatsapp || '',
+                    instagram: form.value.instagram || '',
+                    owner: currentUser.value.email,
+                    createdAt: new Date().toISOString(),
+                    likes: 0,
+                    dislikes: 0
+                };
+
+                profiles.value.unshift(newProfile);
+                await saveData();
+                
+                form.value = { name: '', title: '', bio: '', email: '', whatsapp: '', instagram: '', avatar: '🚀' };
+                showToast('✅ Your profile has been published! 🎉', 'success');
+            }
+
+            // Delete Profile
+            async function deleteProfile(id) {
+                const profile = profiles.value.find(p => p.id === id);
+                if (!profile) return;
+                
+                if (!canDelete(profile)) {
+                    showToast('❌ You can only delete your own profile!', 'error');
+                    return;
+                }
+                
+                if (!confirm(`Delete "${profile.name}"'s profile?`)) return;
+                
+                profiles.value = profiles.value.filter(p => p.id !== id);
+                messages.value = messages.value.filter(m => m.profileId !== id);
+                await saveData();
+                selectedProfile.value = null;
+                showToast('✅ Profile deleted', 'success');
+            }
+
+            // Edit Profile
+            function editProfile(profile) {
+                if (!canEdit(profile)) {
+                    showToast('❌ You can only edit your own profile!', 'error');
+                    return;
+                }
+                
+                const newName = prompt('Edit name:', profile.name);
+                if (newName) profile.name = newName.trim();
+                
+                const newTitle = prompt('Edit title:', profile.title);
+                if (newTitle) profile.title = newTitle.trim();
+                
+                const newBio = prompt('Edit bio:', profile.bio);
+                if (newBio) profile.bio = filterProfanity(newBio.trim());
+                
+                const newAvatar = prompt('Choose avatar (emoji):', profile.avatar);
+                if (newAvatar && newAvatar.length <= 2) profile.avatar = newAvatar;
+                
+                saveData();
+                showToast('✅ Profile updated!', 'success');
+            }
+
+            // Messages
+            function getMessages(profileId) {
+                return messages.value.filter(m => m.profileId === profileId);
+            }
+
+            async function sendMessage(profileId) {
+                if (!chatInput.value.trim()) return;
+                
+                const now = new Date();
+                const msg = {
+                    profileId: profileId,
+                    text: filterProfanity(chatInput.value.trim()),
+                    time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    timestamp: now.getTime(),
+                    sender: visitorName.value.trim() || 'Anonymous'
+                };
+                
+                messages.value.push(msg);
+                chatInput.value = '';
+                await saveData();
+            }
+
+            // Delete Message
+            function canDeleteMessage(msg) {
+                if (isDev.value) return true;
+                if (!selectedProfile.value) return false;
+                return selectedProfile.value.owner === currentUser.value?.email;
+            }
+
+            async function deleteMessage(msg) {
+                messages.value = messages.value.filter(m => m !== msg);
+                await saveData();
+                showToast('🗑️ Message deleted', 'info');
+            }
+
+            // Like/Dislike
+            function likeProfile(id) {
+                if (!currentUser.value && !isDev.value) {
+                    showToast('Please login to like a profile.', 'error');
+                    return;
+                }
+                const p = profiles.value.find(pr => pr.id === id);
+                if (!p) return;
+                p.likes = (p.likes || 0) + 1;
+                saveData();
+                showToast(`👍 Liked ${p.name}'s profile!`, 'success');
+            }
+
+            function dislikeProfile(id) {
+                if (!currentUser.value && !isDev.value) {
+                    showToast('Please login to dislike a profile.', 'error');
+                    return;
+                }
+                const p = profiles.value.find(pr => pr.id === id);
+                if (!p) return;
+                p.dislikes = (p.dislikes || 0) + 1;
+                saveData();
+                showToast(`👎 Disliked ${p.name}'s profile`, 'info');
+            }
+
+            // Share
+            function shareProfile(profile) {
+                const url = window.location.href;
+                const text = `Check out ${profile.name}'s portfolio: ${profile.title} - ${profile.bio}`;
+                if (navigator.share) {
+                    navigator.share({ title: profile.name, text: text, url: url }).catch(() => {});
+                } else {
+                    navigator.clipboard.writeText(`${text} ${url}`).then(() => {
+                        showToast('✅ Profile link copied to clipboard!', 'success');
+                    }).catch(() => {
+                        showToast('📋 Share this link: ' + url, 'info');
+                    });
+                }
+            }
+
+            // Auth
+            async function loginUser() {
+                if (!loginEmail.value || !loginPassword.value) {
+                    showToast('Please enter email and password', 'error');
+                    return;
+                }
+
+                const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+
+                if (isSignup.value) {
+                    if (users[loginEmail.value]) {
+                        showToast('Account already exists', 'error');
+                        return;
+                    }
+                    users[loginEmail.value] = { 
+                        password: loginPassword.value, 
+                        name: loginEmail.value.split('@')[0] 
+                    };
+                    localStorage.setItem('portfolio_users', JSON.stringify(users));
+                    showToast('✅ Account created! Please login.', 'success');
+                    isSignup.value = false;
+                    return;
+                }
+
+                if (!users[loginEmail.value] || users[loginEmail.value].password !== loginPassword.value) {
+                    showToast('❌ Invalid credentials', 'error');
+                    return;
+                }
+
+                currentUser.value = {
+                    email: loginEmail.value,
+                    name: users[loginEmail.value].name || loginEmail.value.split('@')[0]
+                };
+                
+                showLogin.value = false;
+                loginEmail.value = '';
+                loginPassword.value = '';
+                showToast(`✅ Welcome ${currentUser.value.name}! 🎉`, 'success');
+            }
+
+            function logout() {
+                currentUser.value = null;
+                isDev.value = false;
+                showDevDashboard.value = false;
+                showToast('👋 Logged out successfully', 'info');
+            }
+
+            // Dev Mode
+            function activateDevMode() {
+                if (devCodeInput.value === DEV_SECRET_CODE) {
+                    isDev.value = true;
+                    devStatus.value = '✅ Developer mode activated!';
+                    setTimeout(() => {
+                        showDev.value = false;
+                        devCodeInput.value = '';
+                        devStatus.value = '';
+                    }, 1500);
+                    showToast('🔓 Developer mode activated!', 'success');
+                } else {
+                    devStatus.value = '❌ Invalid developer code';
+                    setTimeout(() => { devStatus.value = ''; }, 3000);
+                    showToast('❌ Invalid developer code', 'error');
+                }
+            }
+
+            // Auto-refresh
+            let refreshInterval = null;
+
+            onMounted(() => {
+                loadData();
+                loadSavedVerification();
+                loadNews();
+                refreshInterval = setInterval(() => {
+                    if (selectedProfile.value) {
+                        loadData();
+                    }
+                }, 30000);
+            });
+
+            return {
+                searchQuery,
+                selectedProfile,
+                chatInput,
+                visitorName,
+                showDropdown,
+                profiles,
+                messages,
+                currentUser,
+                showLogin,
+                showDev,
+                loginEmail,
+                loginPassword,
+                isSignup,
+                devCodeInput,
+                devStatus,
+                isDev,
+                showDevDashboard,
+                form,
+                avatars,
+                filteredProfiles,
+                canEdit,
+                canDelete,
+                selectProfile,
+                addProfile,
+                deleteProfile,
+                editProfile,
+                getMessages,
+                sendMessage,
+                loginUser,
+                logout,
+                activateDevMode,
+                secretCodeInput,
+                isVerified,
+                codeMessageText,
+                codeMessageClass,
+                verifyCode,
+                getAllUsers,
+                copyPassword,
+                deleteUserAccount,
+                exportUserData,
+                toast,
+                showToast,
+                // News
+                newsItems,
+                showNewsModal,
+                newsTitle,
+                newsBody,
+                newNotification,
+                unreadNewsCount,
+                addNewsItem,
+                deleteNewsItem,
+                toggleNewsModal,
+                // Likes and share
+                likeProfile,
+                dislikeProfile,
+                shareProfile,
+                canDeleteMessage,
+                deleteMessage,
+                saveData
+            };
+        }
+    }).mount('#app');
+</script>
 </body>
 </html>
