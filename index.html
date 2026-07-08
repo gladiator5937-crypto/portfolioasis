@@ -1,1020 +1,505 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌟 PortfoliOasis - Ultimate Portfolio Directory</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio Builder</title>
     <style>
-        /* Premium Animations */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.1); }
-            50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.3); }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0f0f1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
         }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .container {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            border: 1px solid #2a2a44;
         }
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+
+        h1 {
+            color: #ffffff;
+            font-size: 28px;
+            margin-bottom: 8px;
         }
-        @keyframes rotate-gradient {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        .subtitle {
+            color: #8888aa;
+            font-size: 14px;
+            margin-bottom: 30px;
         }
-        
-        .animate-float { animation: float 3s ease-in-out infinite; }
-        .animate-slide-in { animation: slideIn 0.5s ease-out forwards; }
-        .animate-shimmer {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: shimmer 2s infinite;
+
+        /* === Profile Display === */
+        .profile-card {
+            background: #12121f;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid #2a2a44;
+            text-align: center;
         }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
+
+        .profile-name {
+            color: #ffffff;
+            font-size: 32px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-        
-        .gradient-border {
-            position: relative;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
-            padding: 2px;
-            border-radius: 1.5rem;
+
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #1d9bf0;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 30px;
+            letter-spacing: 0.3px;
+            animation: popIn 0.4s ease-out;
         }
-        
-        .gradient-border > * {
-            background: white;
-            border-radius: 1.5rem;
+
+        .verified-badge .check {
+            font-size: 16px;
         }
-        
-        .hover-scale {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            70% { transform: scale(1.2); }
+            100% { transform: scale(1); opacity: 1; }
         }
-        .hover-scale:hover {
+
+        .profile-title {
+            color: #aab;
+            font-size: 16px;
+            margin-top: 8px;
+        }
+
+        .profile-bio {
+            color: #7788aa;
+            font-size: 14px;
+            margin-top: 12px;
+            line-height: 1.6;
+        }
+
+        /* === Form === */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            color: #ccccee;
+            font-size: 13px;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0f0f1f;
+            border: 1px solid #2a2a4a;
+            border-radius: 10px;
+            color: #eee;
+            font-size: 15px;
+            transition: border 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #1d9bf0;
+            box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.15);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+
+        /* === Secret Code Section === */
+        .secret-section {
+            background: #121222;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px dashed #3a3a5a;
+            margin-top: 5px;
+        }
+
+        .secret-section .label-sm {
+            color: #8899bb;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .code-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .code-input-row input {
+            flex: 1;
+            padding: 10px 14px;
+            background: #0a0a18;
+            border: 1px solid #2a2a4a;
+            border-radius: 8px;
+            color: #eee;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        .code-input-row input:focus {
+            outline: none;
+            border-color: #1d9bf0;
+        }
+
+        .code-input-row button {
+            padding: 10px 22px;
+            background: #1d9bf0;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .code-input-row button:hover {
+            background: #1a8cdb;
             transform: scale(1.02);
-            box-shadow: 0 20px 60px rgba(99, 102, 241, 0.15);
         }
-        
-        .gradient-text {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+
+        .code-input-row button:active {
+            transform: scale(0.97);
         }
-        
-        .neon-glow {
-            box-shadow: 0 0 30px rgba(99, 102, 241, 0.2);
+
+        .code-message {
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 500;
         }
-        
-        .scrollbar-hide::-webkit-scrollbar {
-            display: none;
+
+        .code-message.success {
+            color: #4ade80;
         }
-        .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+
+        .code-message.error {
+            color: #f87171;
         }
-        
-        .card-hover {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+        .code-message.info {
+            color: #60a5fa;
         }
-        .card-hover:hover {
-            transform: translateY(-4px) scale(1.01);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+
+        /* === Save Button === */
+        .save-btn {
+            width: 100%;
+            padding: 14px;
+            background: #1d9bf0;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.2s;
         }
-        
-        .badge-pulse {
-            animation: pulse-glow 2s infinite;
+
+        .save-btn:hover {
+            background: #1a8cdb;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(29, 155, 240, 0.25);
         }
-        
-        .floating-particle {
-            position: fixed;
-            width: 6px;
-            height: 6px;
-            background: rgba(99, 102, 241, 0.1);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: float-particle 15s infinite linear;
+
+        .save-btn:active {
+            transform: translateY(0);
         }
-        
-        @keyframes float-particle {
-            0% { transform: translate(0, 0) scale(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translate(100px, -100vh) scale(1); opacity: 0; }
+
+        .save-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* === Footer === */
+        .footer {
+            margin-top: 25px;
+            color: #445;
+            font-size: 12px;
+            text-align: center;
+            border-top: 1px solid #1a1a30;
+            padding-top: 20px;
+        }
+
+        .footer code {
+            background: #0a0a18;
+            padding: 2px 10px;
+            border-radius: 6px;
+            color: #6af;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        /* === Responsive === */
+        @media (max-width: 500px) {
+            .container {
+                padding: 20px;
+            }
+            .profile-name {
+                font-size: 24px;
+            }
+            .code-input-row {
+                flex-wrap: wrap;
+            }
+            .code-input-row button {
+                width: 100%;
+            }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen">
+<body>
 
-    <div id="app">
-        <!-- Floating Particles -->
-        <div v-for="i in 20" :key="i" class="floating-particle" 
-             :style="{
-                 left: Math.random() * 100 + '%',
-                 top: Math.random() * 100 + '%',
-                 animationDelay: Math.random() * 15 + 's',
-                 animationDuration: (10 + Math.random() * 20) + 's'
-             }">
-        </div>
+    <div class="container">
 
-        <!-- Header -->
-        <header class="glass-card sticky top-0 z-50 px-6 py-4 shadow-xl border-b border-white/20">
-            <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg animate-float">
-                        <span class="text-2xl">🌟</span>
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-extrabold gradient-text tracking-tight">PortfoliOasis</h1>
-                        <p class="text-xs text-slate-400 font-medium">🚀 Where Talent Meets Opportunity</p>
-                    </div>
-                </div>
-                
-                <div class="flex items-center gap-4 flex-wrap">
-                    <div class="flex items-center gap-2 bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm">
-                        <i class="fas fa-users text-indigo-500 text-sm"></i>
-                        <span class="text-sm font-bold text-slate-700">{{ profiles.length }}</span>
-                        <span class="text-xs text-slate-400">profiles</span>
-                    </div>
-                    
-                    <div v-if="currentUser" class="flex items-center gap-3 bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm">
-                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold">
-                            {{ currentUser.name.charAt(0).toUpperCase() }}
-                        </div>
-                        <span class="text-sm font-medium text-slate-700">{{ currentUser.name }}</span>
-                        <button @click="logout" class="text-xs text-red-400 hover:text-red-600 transition-colors">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </button>
-                    </div>
-                    
-                    <button v-else @click="showLogin = true" 
-                            class="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-all hover:scale-105 text-sm">
-                        <i class="fas fa-sign-in-alt mr-2"></i>Login
-                    </button>
-                    
-                    <div class="relative" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
-                        <button class="w-10 h-10 rounded-full hover:bg-white/50 transition-all flex items-center justify-center text-slate-500 hover:text-slate-700">
-                            <i class="fas fa-ellipsis-v text-lg"></i>
-                        </button>
-                        
-                        <div v-show="showDropdown" 
-                             class="absolute right-0 mt-2 w-64 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/30 overflow-hidden transition-all origin-top-right">
-                            <div class="p-3 border-b border-slate-100">
-                                <p class="text-xs font-medium text-slate-400">ACCOUNT</p>
-                                <p class="text-sm font-semibold text-slate-800" v-if="currentUser">{{ currentUser.name }}</p>
-                                <p class="text-sm text-slate-400" v-else>Not logged in</p>
-                            </div>
-                            <button @click="showDev = true" class="w-full text-left px-4 py-3 hover:bg-indigo-50 transition-colors flex items-center gap-3">
-                                <i class="fas fa-cog text-slate-600"></i>
-                                <span class="text-sm">Developer Mode</span>
-                                <span v-if="isDev" class="ml-auto text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">ACTIVE</span>
-                            </button>
-                            <button v-if="!currentUser" @click="showLogin = true" class="w-full text-left px-4 py-3 hover:bg-indigo-50 transition-colors flex items-center gap-3">
-                                <i class="fas fa-key text-slate-600"></i>
-                                <span class="text-sm">Login</span>
-                            </button>
-                            <button v-else @click="logout" class="w-full text-left px-4 py-3 hover:bg-red-50 transition-colors flex items-center gap-3 text-red-600">
-                                <i class="fas fa-sign-out-alt"></i>
-                                <span class="text-sm">Logout</span>
-                            </button>
-                            <div class="border-t border-slate-100 px-4 py-2 text-xs text-slate-400 flex justify-between">
-                                <span><i class="fas fa-user mr-1"></i>{{ profiles.length }} profiles</span>
-                                <span><i class="fas fa-comment mr-1"></i>{{ messages.length }} messages</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <h1>⚡ Portfolio Builder</h1>
+        <p class="subtitle">Build your profile &amp; unlock the verified badge</p>
+
+        <!-- ===== PROFILE CARD (Live Preview) ===== -->
+        <div class="profile-card" id="profileCard">
+            <div class="profile-name" id="displayName">
+                Your Name
+                <span id="badgeContainer"></span>
             </div>
-        </header>
-
-        <!-- Hero Section -->
-        <div class="relative overflow-hidden">
-            <div class="max-w-7xl mx-auto px-6 py-12">
-                <div class="text-center">
-                    <div class="inline-block px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium mb-4 animate-float">
-                        <i class="fas fa-sparkles mr-2"></i> Discover Amazing Talent
-                    </div>
-                    <h2 class="text-4xl md:text-6xl font-extrabold gradient-text leading-tight">
-                        Find Your Next<br>Creative Partner
-                    </h2>
-                    <p class="text-slate-500 mt-4 max-w-2xl mx-auto text-lg">
-                        Connect with designers, developers, and creators from around the world.
-                        Build your network and grow your career.
-                    </p>
-                </div>
+            <div class="profile-title" id="displayTitle">Web Developer</div>
+            <div class="profile-bio" id="displayBio">
+                Building cool stuff on the internet.
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="max-w-7xl mx-auto px-6 pb-12">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                
-                <!-- LEFT COLUMN - Profiles -->
-                <div class="lg:col-span-8 space-y-6">
-                    <!-- Search Bar -->
-                    <div class="gradient-border">
-                        <div class="p-6">
-                            <div class="flex items-center gap-4">
-                                <i class="fas fa-search text-slate-400 text-xl"></i>
-                                <input
-                                    type="text"
-                                    class="flex-1 bg-transparent focus:outline-none text-slate-800 placeholder-slate-400 text-lg"
-                                    placeholder="Search by name, skills, or title..."
-                                    v-model="searchQuery"
-                                />
-                                <button v-if="searchQuery" @click="searchQuery = ''" class="text-slate-400 hover:text-slate-600">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                                <button class="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-all">
-                                    <i class="fas fa-sliders-h mr-2"></i>Filter
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+        <!-- ===== FORM ===== -->
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="nameInput" placeholder="e.g. Alex Rivera" />
+        </div>
 
-                    <!-- Stats -->
-                    <div class="flex gap-4 flex-wrap">
-                        <div class="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full border border-slate-200">
-                            <span class="text-sm font-medium text-slate-600">
-                                <i class="fas fa-user-check text-indigo-500 mr-2"></i>
-                                {{ filteredProfiles.length }} results
-                            </span>
-                        </div>
-                        <div class="bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full border border-slate-200">
-                            <span class="text-sm font-medium text-slate-600">
-                                <i class="fas fa-users text-indigo-500 mr-2"></i>
-                                {{ profiles.length }} total
-                            </span>
-                        </div>
-                    </div>
+        <div class="form-group">
+            <label>Title</label>
+            <input type="text" id="titleInput" placeholder="e.g. Full-Stack Developer" />
+        </div>
 
-                    <!-- Profile Cards -->
-                    <div v-if="filteredProfiles.length === 0" class="text-center py-20">
-                        <div class="text-6xl mb-4">🔍</div>
-                        <h3 class="text-2xl font-bold text-slate-700">No profiles found</h3>
-                        <p class="text-slate-400 mt-2">Try adjusting your search</p>
-                    </div>
+        <div class="form-group">
+            <label>Bio</label>
+            <textarea id="bioInput" placeholder="Tell the world about yourself..."></textarea>
+        </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div v-for="(profile, index) in filteredProfiles" :key="profile.id"
-                             @click="selectProfile(profile)"
-                             class="card-hover bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/30 shadow-lg cursor-pointer animate-slide-in"
-                             :style="{ animationDelay: (index * 0.05) + 's' }">
-                            
-                            <div class="flex items-start gap-4">
-                                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-3xl flex-shrink-0 shadow-inner">
-                                    {{ profile.avatar || '🚀' }}
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <div class="flex justify-between items-start">
-                                        <div>
-                                            <h3 class="font-bold text-slate-900 text-lg truncate">{{ profile.name }}</h3>
-                                            <p class="text-xs font-semibold text-indigo-600">{{ profile.title }}</p>
-                                        </div>
-                                        <div class="flex items-center gap-1">
-                                            <span v-if="profile.owner" class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">
-                                                <i class="fas fa-check-circle text-[10px]"></i> Verified
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <p class="text-sm text-slate-500 mt-2 line-clamp-2">{{ profile.bio }}</p>
-                                    <div class="flex gap-2 mt-3 flex-wrap">
-                                        <span v-if="profile.email" class="text-xs bg-slate-100 px-2 py-1 rounded-full">
-                                            <i class="fas fa-envelope text-slate-400 mr-1"></i>Email
-                                        </span>
-                                        <span v-if="profile.whatsapp" class="text-xs bg-green-50 text-green-600 px-2 py-1 rounded-full">
-                                            <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                                        </span>
-                                        <span v-if="profile.instagram" class="text-xs bg-pink-50 text-pink-600 px-2 py-1 rounded-full">
-                                            <i class="fab fa-instagram mr-1"></i>Instagram
-                                        </span>
-                                        <span class="text-xs bg-slate-50 px-2 py-1 rounded-full">
-                                            <i class="far fa-clock text-slate-400 mr-1"></i>
-                                            {{ new Date(profile.createdAt).toLocaleDateString() }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RIGHT COLUMN -->
-                <div class="lg:col-span-4 space-y-6">
-                    
-                    <!-- Selected Profile Card -->
-                    <div v-if="selectedProfile" class="sticky top-28">
-                        <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
-                            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex items-center gap-4">
-                                        <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-4xl">
-                                            {{ selectedProfile.avatar || '🚀' }}
-                                        </div>
-                                        <div>
-                                            <h2 class="text-xl font-bold">{{ selectedProfile.name }}</h2>
-                                            <p class="text-sm text-white/80">{{ selectedProfile.title }}</p>
-                                        </div>
-                                    </div>
-                                    <button @click="selectedProfile = null" class="text-white/60 hover:text-white">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div class="p-6 space-y-4">
-                                <div>
-                                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                        <i class="fas fa-user mr-2"></i>About
-                                    </h4>
-                                    <p class="text-sm text-slate-600 leading-relaxed">{{ selectedProfile.bio }}</p>
-                                </div>
-
-                                <div v-if="selectedProfile.email || selectedProfile.whatsapp || selectedProfile.instagram" class="border-t pt-4">
-                                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-                                        <i class="fas fa-address-card mr-2"></i>Contact
-                                    </h4>
-                                    <div class="flex gap-2 flex-wrap">
-                                        <a v-if="selectedProfile.email" :href="'mailto:' + selectedProfile.email" 
-                                           class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-xl text-sm transition-colors">
-                                            <i class="fas fa-envelope mr-1"></i>Email
-                                        </a>
-                                        <a v-if="selectedProfile.whatsapp" :href="'https://wa.me/' + selectedProfile.whatsapp" target="_blank"
-                                           class="px-3 py-2 bg-green-50 hover:bg-green-100 text-green-700 rounded-xl text-sm transition-colors">
-                                            <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                                        </a>
-                                        <a v-if="selectedProfile.instagram" :href="'https://instagram.com/' + selectedProfile.instagram" target="_blank"
-                                           class="px-3 py-2 bg-pink-50 hover:bg-pink-100 text-pink-700 rounded-xl text-sm transition-colors">
-                                            <i class="fab fa-instagram mr-1"></i>Instagram
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <!-- Chat -->
-                                <div class="border-t pt-4">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                                            <i class="fas fa-comments mr-2"></i>Live Chat
-                                        </h4>
-                                        <span class="text-xs text-slate-400">{{ getMessages(selectedProfile.id).length }} messages</span>
-                                    </div>
-                                    
-                                    <div class="bg-slate-50 rounded-2xl p-4 h-52 overflow-y-auto space-y-2 scrollbar-hide">
-                                        <div v-if="getMessages(selectedProfile.id).length === 0" class="text-center py-8">
-                                            <div class="text-3xl mb-2">💬</div>
-                                            <p class="text-xs text-slate-400">No messages yet. Start the conversation!</p>
-                                        </div>
-                                        <div v-for="msg in getMessages(selectedProfile.id)" :key="msg.timestamp" 
-                                             class="bg-white rounded-xl p-3 shadow-sm border border-slate-100 animate-slide-in">
-                                            <div class="flex justify-between text-xs font-bold">
-                                                <span :class="msg.sender === selectedProfile.name ? 'text-green-600' : 'text-indigo-600'">
-                                                    <i class="fas fa-user-circle mr-1"></i>{{ msg.sender || 'Anonymous' }}
-                                                </span>
-                                                <span class="text-slate-400 font-normal">{{ msg.time }}</span>
-                                            </div>
-                                            <p class="text-sm text-slate-700 mt-1">{{ msg.text }}</p>
-                                        </div>
-                                    </div>
-
-                                    <div class="mt-3">
-                                        <input 
-                                            type="text" 
-                                            v-model="visitorName"
-                                            placeholder="Your name..."
-                                            class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-2"
-                                        />
-                                        <div class="flex gap-2">
-                                            <input 
-                                                type="text" 
-                                                v-model="chatInput"
-                                                @keyup.enter="sendMessage(selectedProfile.id)"
-                                                placeholder="Type a message..."
-                                                class="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
-                                            />
-                                            <button @click="sendMessage(selectedProfile.id)"
-                                                    class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all">
-                                                <i class="fas fa-paper-plane"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Actions -->
-                                <div class="border-t pt-4 flex gap-2">
-                                    <button v-if="canEdit(selectedProfile)" @click="editProfile(selectedProfile)"
-                                            class="flex-1 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors text-sm font-medium">
-                                        <i class="fas fa-edit mr-1"></i>Edit
-                                    </button>
-                                    <button v-if="canDelete(selectedProfile)" @click="deleteProfile(selectedProfile.id)"
-                                            class="flex-1 px-4 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors text-sm font-medium">
-                                        <i class="fas fa-trash mr-1"></i>Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Add Profile Form -->
-                    <div v-else class="sticky top-28">
-                        <div class="glass-card rounded-3xl shadow-2xl p-6 border border-white/30">
-                            <div class="text-center mb-6">
-                                <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-3xl mx-auto shadow-lg animate-float">
-                                    <i class="fas fa-plus text-white"></i>
-                                </div>
-                                <h3 class="text-xl font-bold text-slate-800 mt-4">Create Your Profile</h3>
-                                <p class="text-sm text-slate-400">Join the community of creators</p>
-                            </div>
-
-                            <form @submit.prevent="addProfile" class="space-y-3">
-                                <div class="relative">
-                                    <i class="fas fa-user absolute left-3 top-3 text-slate-400"></i>
-                                    <input 
-                                        type="text" 
-                                        v-model="form.name"
-                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                                        placeholder="Full Name *"
-                                        required
-                                        :disabled="!currentUser"
-                                    />
-                                </div>
-                                
-                                <div class="relative">
-                                    <i class="fas fa-briefcase absolute left-3 top-3 text-slate-400"></i>
-                                    <input 
-                                        type="text" 
-                                        v-model="form.title"
-                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                                        placeholder="Headline *"
-                                        required
-                                        :disabled="!currentUser"
-                                    />
-                                </div>
-                                
-                                <div class="relative">
-                                    <i class="fas fa-align-left absolute left-3 top-3 text-slate-400"></i>
-                                    <textarea 
-                                        v-model="form.bio"
-                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm resize-none"
-                                        placeholder="Tell us about yourself..."
-                                        rows="3"
-                                        :disabled="!currentUser"
-                                    ></textarea>
-                                </div>
-
-                                <div>
-                                    <label class="text-xs font-medium text-slate-500 block mb-2">
-                                        <i class="fas fa-smile mr-1"></i>Choose Avatar
-                                    </label>
-                                    <div class="flex gap-1 flex-wrap">
-                                        <button v-for="e in avatars" :key="e" @click="form.avatar = e" type="button"
-                                                :class="['w-10 h-10 rounded-xl text-lg transition-all', 
-                                                         form.avatar === e ? 'bg-indigo-100 ring-2 ring-indigo-500 scale-110' : 'bg-slate-50 hover:bg-slate-100']"
-                                                :disabled="!currentUser">
-                                            {{ e }}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="space-y-2">
-                                    <div class="relative">
-                                        <i class="fas fa-envelope absolute left-3 top-3 text-slate-400"></i>
-                                        <input 
-                                            type="email" 
-                                            v-model="form.email"
-                                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                                            placeholder="Email"
-                                            :disabled="!currentUser"
-                                        />
-                                    </div>
-                                    <div class="relative">
-                                        <i class="fab fa-whatsapp absolute left-3 top-3 text-slate-400"></i>
-                                        <input 
-                                            type="text" 
-                                            v-model="form.whatsapp"
-                                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                                            placeholder="WhatsApp"
-                                            :disabled="!currentUser"
-                                        />
-                                    </div>
-                                    <div class="relative">
-                                        <i class="fab fa-instagram absolute left-3 top-3 text-slate-400"></i>
-                                        <input 
-                                            type="text" 
-                                            v-model="form.instagram"
-                                            class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                                            placeholder="Instagram"
-                                            :disabled="!currentUser"
-                                        />
-                                    </div>
-                                </div>
-
-                                <button type="submit" 
-                                        :disabled="!currentUser"
-                                        class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <i class="fas fa-rocket mr-2"></i>
-                                    {{ currentUser ? 'Launch Profile 🚀' : '🔒 Login to Create' }}
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+        <!-- ===== SECRET CODE SECTION ===== -->
+        <div class="secret-section">
+            <div class="label-sm">🔑 Unlock Verified Badge</div>
+            <div class="code-input-row">
+                <input type="text" id="codeInput" placeholder="Enter secret code" maxlength="20" />
+                <button id="verifyBtn">Verify</button>
+            </div>
+            <div id="codeMessage" class="code-message info">
+                💡 Try: <strong>DEVMODE</strong> or <strong>BUILTBYME</strong>
             </div>
         </div>
 
-        <!-- LOGIN MODAL -->
-        <div v-if="showLogin" class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4" @click.self="showLogin = false">
-            <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 transform transition-all animate-slide-in">
-                <div class="text-center mb-6">
-                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-3xl mx-auto shadow-lg animate-float">
-                        <i class="fas fa-lock text-white"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-slate-800 mt-4">Welcome Back</h2>
-                    <p class="text-sm text-slate-400">Sign in to manage your portfolio</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <input 
-                        type="email" 
-                        v-model="loginEmail"
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                        placeholder="Email address"
-                    />
-                    <input 
-                        type="password" 
-                        v-model="loginPassword"
-                        @keyup.enter="loginUser"
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
-                        placeholder="Password"
-                    />
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" v-model="isSignup" class="rounded border-slate-300 text-indigo-600" />
-                        <label class="text-sm text-slate-600">Create new account</label>
-                    </div>
-                    <button @click="loginUser" class="w-full py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
-                        <i class="fas fa-sign-in-alt mr-2"></i>
-                        {{ isSignup ? 'Create Account' : 'Sign In' }}
-                    </button>
-                    <button @click="showLogin = false" class="w-full py-2 text-sm text-slate-400 hover:text-slate-600 transition-colors">
-                        Cancel
-                    </button>
-                </div>
-            </div>
+        <!-- ===== SAVE BUTTON ===== -->
+        <button class="save-btn" id="saveBtn">💾 Save Portfolio</button>
+
+        <div class="footer">
+            🔒 Secret codes: <code>DEVMODE</code> · <code>BUILTBYME</code> · <code>PORTFOLIO2026</code>
         </div>
 
-        <!-- DEVELOPER MODAL -->
-        <div v-if="showDev" class="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-4" @click.self="showDev = false">
-            <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 transform transition-all animate-slide-in">
-                <div class="text-center mb-6">
-                    <div class="w-20 h-20 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-3xl mx-auto shadow-lg animate-float">
-                        <i class="fas fa-code text-white"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold text-slate-800 mt-4">Developer Mode</h2>
-                    <p class="text-sm text-slate-400">Enter the secret code to unlock admin powers</p>
-                </div>
-                
-                <div class="space-y-4">
-                    <input 
-                        type="password" 
-                        v-model="devCodeInput"
-                        @keyup.enter="activateDevMode"
-                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-sm font-mono"
-                        placeholder="Enter developer code..."
-                    />
-                    <button @click="activateDevMode" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all">
-                        <i class="fas fa-unlock mr-2"></i>
-                        Activate Developer Mode
-                    </button>
-                    <button @click="showDev = false" class="w-full py-2 text-sm text-slate-400 hover:text-slate-600 transition-colors">
-                        Cancel
-                    </button>
-                    <p v-if="devStatus" class="text-sm text-center font-medium" :class="devStatus.includes('✅') ? 'text-green-600' : 'text-red-600'">
-                        {{ devStatus }}
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <footer class="mt-12 border-t border-slate-200/50 py-8">
-            <div class="max-w-7xl mx-auto px-6 flex flex-wrap justify-between items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-xl">🌟</span>
-                    <span class="font-bold gradient-text">PortfoliOasis</span>
-                    <span class="text-xs text-slate-400">© 2024</span>
-                </div>
-                <div class="flex gap-6 text-sm text-slate-400">
-                    <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-github mr-1"></i>GitHub</a>
-                    <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-twitter mr-1"></i>Twitter</a>
-                    <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-linkedin mr-1"></i>LinkedIn</a>
-                </div>
-            </div>
-        </footer>
     </div>
 
     <script>
-        const { createApp, ref, computed, onMounted } = Vue;
-
         // ============================================================
-        // YOUR JSONBIN CREDENTIALS
+        // CONFIG — Add any codes you want here (case-sensitive)
         // ============================================================
-        const BIN_ID = '6a4e1171da38895dfe3f5885';
-        const API_KEY = '$2a$10$9H5oG80cnlBePFC2af5G5edtOsIn6o2YDVdFws9VDqImy8Vnuf4PO';
-        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
-        // ============================================================
-
-        // 🔑 SECRET DEVELOPER CODE
-        const DEV_SECRET_CODE = 'PortfoliOasis2024!@#';
-
-        // 🚫 PROFANITY LIST
-        const PROFANITY_LIST = ['fuck', 'shit', 'asshole', 'bitch', 'cunt', 'dick', 'pussy', 'bastard', 'whore', 'slut', 'damn', 'hell', 'crap', 'stupid', 'idiot', 'moron'];
-
-        // 📦 SAMPLE PROFILES
-        const SAMPLE_PROFILES = [
-            {
-                id: '1001',
-                name: 'Sarah Johnson',
-                title: 'Full Stack Developer',
-                bio: 'Building web applications with React, Node.js, and AWS. 5+ years of experience.',
-                avatar: '💻',
-                email: 'sarah@example.com',
-                whatsapp: '1234567890',
-                instagram: 'sarahdev',
-                owner: 'sarah@example.com',
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '1002',
-                name: 'Mike Chen',
-                title: 'UI/UX Designer',
-                bio: 'Creating beautiful and functional designs with Figma and Adobe XD.',
-                avatar: '🎨',
-                email: 'mike@example.com',
-                whatsapp: '',
-                instagram: 'mikedesigned',
-                owner: 'mike@example.com',
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '1003',
-                name: 'Aisha Patel',
-                title: 'Blockchain Developer',
-                bio: 'Specializing in Ethereum, Solidity, and DeFi applications.',
-                avatar: '⛓️',
-                email: 'aisha@example.com',
-                whatsapp: '9876543210',
-                instagram: 'aishablockchain',
-                owner: 'aisha@example.com',
-                createdAt: new Date().toISOString()
-            }
+        const SECRET_CODES = [
+            "DEVMODE",
+            "BUILTBYME",
+            "PORTFOLIO2026",
+            "ZEROBUGS"
         ];
 
-        createApp({
-            setup() {
-                const searchQuery = ref('');
-                const selectedProfile = ref(null);
-                const chatInput = ref('');
-                const visitorName = ref('');
-                const showDropdown = ref(false);
-                
-                // Data
-                const profiles = ref([]);
-                const messages = ref([]);
-                
-                // Auth
-                const currentUser = ref(null);
-                const showLogin = ref(false);
-                const showDev = ref(false);
-                const loginEmail = ref('');
-                const loginPassword = ref('');
-                const isSignup = ref(false);
-                const devCodeInput = ref('');
-                const devStatus = ref('');
-                const isDev = ref(false);
+        // ============================================================
+        // STATE
+        // ============================================================
+        let isVerified = false;
 
-                // Form
-                const form = ref({ 
-                    name: '', 
-                    title: '', 
-                    bio: '', 
-                    email: '', 
-                    whatsapp: '', 
-                    instagram: '',
-                    avatar: '🚀'
-                });
+        // ============================================================
+        // DOM REFS
+        // ============================================================
+        const nameInput = document.getElementById('nameInput');
+        const titleInput = document.getElementById('titleInput');
+        const bioInput = document.getElementById('bioInput');
+        const displayName = document.getElementById('displayName');
+        const displayTitle = document.getElementById('displayTitle');
+        const displayBio = document.getElementById('displayBio');
+        const badgeContainer = document.getElementById('badgeContainer');
+        const codeInput = document.getElementById('codeInput');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const codeMessage = document.getElementById('codeMessage');
+        const saveBtn = document.getElementById('saveBtn');
 
-                const avatars = ['🚀', '💻', '🎨', '📊', '🧠', '⚡', '🌟', '🎯', '👩‍💻', '👨‍💻', '📸', '💼', '🦄', '🔥', '✨', '🎮'];
+        // ============================================================
+        // UPDATE PROFILE PREVIEW (live)
+        // ============================================================
+        function updateProfile() {
+            const name = nameInput.value.trim() || 'Your Name';
+            const title = titleInput.value.trim() || 'Web Developer';
+            const bio = bioInput.value.trim() || 'Building cool stuff on the internet.';
 
-                // Computed
-                const filteredProfiles = computed(() => {
-                    if (!searchQuery.value) return profiles.value;
-                    const q = searchQuery.value.toLowerCase();
-                    return profiles.value.filter(p => 
-                        p.name.toLowerCase().includes(q) || 
-                        p.title.toLowerCase().includes(q) ||
-                        p.bio.toLowerCase().includes(q)
-                    );
-                });
+            // Update name with badge
+            displayName.innerHTML = `${name} ${isVerified ? '<span class="verified-badge"><span class="check">✅</span> Verified</span>' : ''}`;
 
-                // Permissions
-                const canEdit = (profile) => {
-                    if (isDev.value) return true;
-                    if (!currentUser.value) return false;
-                    return profile.owner === currentUser.value.email;
-                };
+            displayTitle.textContent = title;
+            displayBio.textContent = bio;
+        }
 
-                const canDelete = (profile) => {
-                    if (isDev.value) return true;
-                    if (!currentUser.value) return false;
-                    return profile.owner === currentUser.value.email;
-                };
+        // ============================================================
+        // VERIFY CODE
+        // ============================================================
+        function verifyCode() {
+            const entered = codeInput.value.trim();
 
-                // Profanity Filter
-                const filterProfanity = (text) => {
-                    if (!text) return text;
-                    let filtered = text;
-                    PROFANITY_LIST.forEach(word => {
-                        filtered = filtered.replace(new RegExp(word, 'gi'), '****');
-                    });
-                    return filtered;
-                };
-
-                // Load Data
-                async function loadData() {
-                    try {
-                        console.log('📡 Loading data...');
-                        
-                        const response = await fetch(`${API_URL}/latest`, {
-                            headers: { 'X-Master-Key': API_KEY }
-                        });
-                        
-                        if (response.ok) {
-                            const data = await response.json();
-                            if (data.record && data.record.profiles && data.record.profiles.length > 0) {
-                                profiles.value = data.record.profiles;
-                                messages.value = data.record.messages || [];
-                                console.log('✅ Loaded from JSONBin:', profiles.value.length, 'profiles');
-                                return;
-                            }
-                        }
-                        
-                        // Use sample data
-                        console.log('📦 Using sample data');
-                        profiles.value = [...SAMPLE_PROFILES];
-                        messages.value = [];
-                        
-                    } catch (error) {
-                        console.error('❌ Error:', error);
-                        profiles.value = [...SAMPLE_PROFILES];
-                        messages.value = [];
-                    }
-                }
-
-                // Save Data
-                async function saveData() {
-                    try {
-                        const data = { 
-                            profiles: profiles.value, 
-                            messages: messages.value 
-                        };
-                        await fetch(API_URL, {
-                            method: 'PUT',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-Master-Key': API_KEY
-                            },
-                            body: JSON.stringify(data)
-                        });
-                        console.log('✅ Data saved');
-                    } catch (error) {
-                        console.error('❌ Save error:', error);
-                    }
-                }
-
-                // Select Profile
-                function selectProfile(profile) {
-                    selectedProfile.value = profile;
-                }
-
-                // Add Profile
-                async function addProfile() {
-                    if (!currentUser.value) {
-                        alert('Please login first');
-                        return;
-                    }
-
-                    if (!form.value.name || !form.value.title) {
-                        alert('Name and Headline are required');
-                        return;
-                    }
-
-                    const existing = profiles.value.find(p => p.owner === currentUser.value.email);
-                    if (existing) {
-                        alert('You already have a portfolio! You can edit it instead.');
-                        return;
-                    }
-
-                    const newProfile = {
-                        id: Date.now().toString().slice(-6),
-                        name: form.value.name.trim(),
-                        title: form.value.title.trim(),
-                        bio: filterProfanity(form.value.bio.trim()) || 'No biography provided.',
-                        avatar: form.value.avatar || '🚀',
-                        email: form.value.email || '',
-                        whatsapp: form.value.whatsapp || '',
-                        instagram: form.value.instagram || '',
-                        owner: currentUser.value.email,
-                        createdAt: new Date().toISOString()
-                    };
-
-                    profiles.value.unshift(newProfile);
-                    await saveData();
-                    
-                    form.value = { name: '', title: '', bio: '', email: '', whatsapp: '', instagram: '', avatar: '🚀' };
-                    alert('✅ Your profile has been published! 🎉');
-                }
-
-                // Delete Profile
-                async function deleteProfile(id) {
-                    const profile = profiles.value.find(p => p.id === id);
-                    if (!profile) return;
-                    
-                    if (!canDelete(profile)) {
-                        alert('❌ You can only delete your own profile!');
-                        return;
-                    }
-                    
-                    if (!confirm(`Delete "${profile.name}"'s profile?`)) return;
-                    
-                    profiles.value = profiles.value.filter(p => p.id !== id);
-                    messages.value = messages.value.filter(m => m.profileId !== id);
-                    await saveData();
-                    selectedProfile.value = null;
-                    alert('✅ Profile deleted');
-                }
-
-                // Edit Profile
-                function editProfile(profile) {
-                    if (!canEdit(profile)) {
-                        alert('❌ You can only edit your own profile!');
-                        return;
-                    }
-                    
-                    const newName = prompt('Edit name:', profile.name);
-                    if (newName) profile.name = newName.trim();
-                    
-                    const newTitle = prompt('Edit title:', profile.title);
-                    if (newTitle) profile.title = newTitle.trim();
-                    
-                    const newBio = prompt('Edit bio:', profile.bio);
-                    if (newBio) profile.bio = filterProfanity(newBio.trim());
-                    
-                    const newAvatar = prompt('Choose avatar (emoji):', profile.avatar);
-                    if (newAvatar && newAvatar.length <= 2) profile.avatar = newAvatar;
-                    
-                    saveData();
-                    alert('✅ Profile updated!');
-                }
-
-                // Messages
-                function getMessages(profileId) {
-                    return messages.value.filter(m => m.profileId === profileId);
-                }
-
-                async function sendMessage(profileId) {
-                    if (!chatInput.value.trim()) return;
-                    
-                    const now = new Date();
-                    const msg = {
-                        profileId: profileId,
-                        text: filterProfanity(chatInput.value.trim()),
-                        time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        timestamp: now.getTime(),
-                        sender: visitorName.value.trim() || 'Anonymous'
-                    };
-                    
-                    messages.value.push(msg);
-                    chatInput.value = '';
-                    await saveData();
-                }
-
-                // Auth
-                async function loginUser() {
-                    if (!loginEmail.value || !loginPassword.value) {
-                        alert('Please enter email and password');
-                        return;
-                    }
-
-                    const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
-
-                    if (isSignup.value) {
-                        if (users[loginEmail.value]) {
-                            alert('Account already exists');
-                            return;
-                        }
-                        users[loginEmail.value] = { 
-                            password: loginPassword.value, 
-                            name: loginEmail.value.split('@')[0] 
-                        };
-                        localStorage.setItem('portfolio_users', JSON.stringify(users));
-                        alert('✅ Account created! Please login.');
-                        isSignup.value = false;
-                        return;
-                    }
-
-                    if (!users[loginEmail.value] || users[loginEmail.value].password !== loginPassword.value) {
-                        alert('❌ Invalid credentials');
-                        return;
-                    }
-
-                    currentUser.value = {
-                        email: loginEmail.value,
-                        name: users[loginEmail.value].name || loginEmail.value.split('@')[0]
-                    };
-                    
-                    showLogin.value = false;
-                    loginEmail.value = '';
-                    loginPassword.value = '';
-                    alert(`✅ Welcome ${currentUser.value.name}! 🎉`);
-                }
-
-                function logout() {
-                    currentUser.value = null;
-                    isDev.value = false;
-                    alert('👋 Logged out successfully');
-                }
-
-                // Dev Mode
-                function activateDevMode() {
-                    if (devCodeInput.value === DEV_SECRET_CODE) {
-                        isDev.value = true;
-                        devStatus.value = '✅ Developer mode activated!';
-                        setTimeout(() => {
-                            showDev.value = false;
-                            devCodeInput.value = '';
-                            devStatus.value = '';
-                        }, 1500);
-                        alert('🔓 Developer mode activated! You can now edit/delete any profile.');
-                    } else {
-                        devStatus.value = '❌ Invalid developer code';
-                        setTimeout(() => { devStatus.value = ''; }, 3000);
-                    }
-                }
-
-                // Auto-refresh
-                let refreshInterval = null;
-
-                onMounted(() => {
-                    loadData();
-                    refreshInterval = setInterval(() => {
-                        if (selectedProfile.value) {
-                            loadData();
-                        }
-                    }, 30000);
-                });
-
-                return {
-                    searchQuery,
-                    selectedProfile,
-                    chatInput,
-                    visitorName,
-                    showDropdown,
-                    profiles,
-                    messages,
-                    currentUser,
-                    showLogin,
-                    showDev,
-                    loginEmail,
-                    loginPassword,
-                    isSignup,
-                    devCodeInput,
-                    devStatus,
-                    isDev,
-                    form,
-                    avatars,
-                    filteredProfiles,
-                    canEdit,
-                    canDelete,
-                    selectProfile,
-                    addProfile,
-                    deleteProfile,
-                    editProfile,
-                    getMessages,
-                    sendMessage,
-                    loginUser,
-                    logout,
-                    activateDevMode
-                };
+            if (!entered) {
+                codeMessage.className = 'code-message info';
+                codeMessage.innerHTML = '🔑 Enter a secret code to unlock the badge.';
+                return;
             }
-        }).mount('#app');
+
+            if (SECRET_CODES.includes(entered)) {
+                isVerified = true;
+                codeMessage.className = 'code-message success';
+                codeMessage.innerHTML = '✅ Verified! Your badge has been unlocked. 🎉';
+                updateProfile();
+            } else {
+                isVerified = false;
+                codeMessage.className = 'code-message error';
+                codeMessage.innerHTML = '❌ Invalid code. Try again.';
+                updateProfile();
+            }
+        }
+
+        // ============================================================
+        // SAVE PORTFOLIO (simulated)
+        // ============================================================
+        function savePortfolio() {
+            saveBtn.textContent = '💾 Saving...';
+            saveBtn.disabled = true;
+
+            // Simulate saving to a database / local storage
+            setTimeout(() => {
+                // Save to localStorage so it persists on refresh
+                const data = {
+                    name: nameInput.value.trim(),
+                    title: titleInput.value.trim(),
+                    bio: bioInput.value.trim(),
+                    verified: isVerified,
+                    codeUsed: codeInput.value.trim()
+                };
+                localStorage.setItem('portfolioData', JSON.stringify(data));
+
+                saveBtn.textContent = '✅ Saved!';
+                saveBtn.style.background = '#4ade80';
+                saveBtn.style.color = '#0f0f1a';
+
+                setTimeout(() => {
+                    saveBtn.textContent = '💾 Save Portfolio';
+                    saveBtn.style.background = '#1d9bf0';
+                    saveBtn.style.color = 'white';
+                    saveBtn.disabled = false;
+                }, 1500);
+
+                alert('🎉 Portfolio saved successfully!\n\n' +
+                    `Name: ${data.name || 'Not set'}\n` +
+                    `Title: ${data.title || 'Not set'}\n` +
+                    `Verified: ${data.verified ? '✅ Yes' : '❌ No'}`);
+            }, 800);
+        }
+
+        // ============================================================
+        // LOAD SAVED DATA (if any)
+        // ============================================================
+        function loadSavedData() {
+            const saved = localStorage.getItem('portfolioData');
+            if (!saved) return;
+
+            try {
+                const data = JSON.parse(saved);
+                nameInput.value = data.name || '';
+                titleInput.value = data.title || '';
+                bioInput.value = data.bio || '';
+                if (data.verified) {
+                    isVerified = true;
+                    codeInput.value = data.codeUsed || '';
+                    codeMessage.className = 'code-message success';
+                    codeMessage.innerHTML = '✅ Previously verified! Badge restored. 🎉';
+                }
+                updateProfile();
+            } catch (e) {
+                // ignore
+            }
+        }
+
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
+        nameInput.addEventListener('input', updateProfile);
+        titleInput.addEventListener('input', updateProfile);
+        bioInput.addEventListener('input', updateProfile);
+
+        verifyBtn.addEventListener('click', verifyCode);
+
+        codeInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                verifyCode();
+            }
+        });
+
+        saveBtn.addEventListener('click', savePortfolio);
+
+        // ============================================================
+        // INIT
+        // ============================================================
+        loadSavedData();
+        updateProfile();
+
+        console.log('🚀 Portfolio Builder loaded!');
+        console.log('🔑 Secret codes:', SECRET_CODES.join(', '));
     </script>
+
 </body>
 </html>
