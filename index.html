@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Portfolio Builder</title>
+    <title>My Portfolio</title>
     <style>
+        /* ===== RESET & BASE ===== */
         * {
             margin: 0;
             padding: 0;
@@ -14,55 +15,102 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #0f0f1a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
+            color: #fff;
+            line-height: 1.6;
         }
 
-        .container {
+        /* ===== NAVIGATION ===== */
+        nav {
             background: #1a1a2e;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-            border: 1px solid #2a2a44;
-        }
-
-        h1 {
-            color: #ffffff;
-            font-size: 28px;
-            margin-bottom: 8px;
-        }
-
-        .subtitle {
-            color: #8888aa;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-
-        .profile-card {
-            background: #12121f;
-            border-radius: 16px;
-            padding: 30px;
-            margin-bottom: 30px;
-            border: 1px solid #2a2a44;
-            text-align: center;
-        }
-
-        .profile-name {
-            color: #ffffff;
-            font-size: 32px;
-            font-weight: 700;
+            padding: 18px 40px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
+            border-bottom: 1px solid #2a2a44;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1d9bf0;
+        }
+
+        .logo span {
+            color: #fff;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #aab;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #1d9bf0;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            padding: 80px 40px 60px;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .hero h1 .highlight {
+            color: #1d9bf0;
+        }
+
+        .hero .badge-display {
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .hero p {
+            color: #8899bb;
+            font-size: 18px;
+            max-width: 600px;
+            margin: 10px auto 30px;
+        }
+
+        .hero .btn {
+            display: inline-block;
+            padding: 14px 40px;
+            background: #1d9bf0;
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .hero .btn:hover {
+            background: #1a8cdb;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(29, 155, 240, 0.3);
+        }
+
+        /* ===== VERIFIED BADGE ===== */
         .verified-badge {
             display: inline-flex;
             align-items: center;
@@ -71,114 +119,169 @@
             color: white;
             font-size: 13px;
             font-weight: 600;
-            padding: 4px 14px;
+            padding: 4px 16px;
             border-radius: 30px;
             letter-spacing: 0.3px;
-            animation: popIn 0.4s ease-out;
+            animation: popIn 0.5s ease-out;
         }
 
         @keyframes popIn {
-            0% { transform: scale(0); opacity: 0; }
-            70% { transform: scale(1.2); }
-            100% { transform: scale(1); opacity: 1; }
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            70% { transform: scale(1.2) rotate(2deg); }
+            100% { transform: scale(1) rotate(0); opacity: 1; }
         }
 
-        .profile-title {
-            color: #aab;
-            font-size: 16px;
-            margin-top: 8px;
+        /* ===== SECTIONS ===== */
+        .section {
+            padding: 60px 40px;
+            max-width: 1100px;
+            margin: 0 auto;
         }
 
-        .profile-bio {
-            color: #7788aa;
-            font-size: 14px;
-            margin-top: 12px;
-            line-height: 1.6;
+        .section h2 {
+            font-size: 32px;
+            margin-bottom: 30px;
+            text-align: center;
         }
 
-        .form-group {
-            margin-bottom: 18px;
+        .section h2 .highlight {
+            color: #1d9bf0;
         }
 
-        .form-group label {
-            color: #ccccee;
-            font-size: 13px;
-            font-weight: 600;
+        /* ===== SKILLS ===== */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 20px;
+            text-align: center;
+        }
+
+        .skill-card {
+            background: #1a1a2e;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #2a2a44;
+            transition: 0.3s;
+        }
+
+        .skill-card:hover {
+            border-color: #1d9bf0;
+            transform: translateY(-5px);
+        }
+
+        .skill-card .icon {
+            font-size: 36px;
             display: block;
+            margin-bottom: 8px;
+        }
+
+        .skill-card .name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* ===== PROJECTS ===== */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .project-card {
+            background: #1a1a2e;
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #2a2a44;
+            transition: 0.3s;
+        }
+
+        .project-card:hover {
+            border-color: #1d9bf0;
+            transform: translateY(-5px);
+        }
+
+        .project-card h3 {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .project-card p {
+            color: #8899bb;
+            font-size: 14px;
+        }
+
+        .project-card .tech {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .project-card .tech span {
+            background: #0f0f1f;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #1d9bf0;
+            border: 1px solid #1d9bf033;
+        }
+
+        /* ===== SECRET CODE SECTION ===== */
+        .secret-section {
+            background: #1a1a2e;
+            border-radius: 16px;
+            padding: 35px;
+            border: 1px solid #2a2a44;
+            max-width: 600px;
+            margin: 0 auto 40px;
+            text-align: center;
+        }
+
+        .secret-section h3 {
+            font-size: 22px;
             margin-bottom: 6px;
         }
 
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 12px 16px;
-            background: #0f0f1f;
-            border: 1px solid #2a2a4a;
-            border-radius: 10px;
-            color: #eee;
-            font-size: 15px;
-            transition: border 0.3s;
-            font-family: inherit;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #1d9bf0;
-            box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.15);
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 70px;
-        }
-
-        .secret-section {
-            background: #121222;
-            border-radius: 12px;
-            padding: 20px;
-            border: 1px dashed #3a3a5a;
-            margin-top: 5px;
-        }
-
-        .secret-section .label-sm {
+        .secret-section .sub {
             color: #8899bb;
-            font-size: 12px;
-            font-weight: 500;
-            margin-bottom: 4px;
+            font-size: 14px;
+            margin-bottom: 20px;
         }
 
         .code-input-row {
             display: flex;
             gap: 10px;
-            align-items: center;
+            max-width: 420px;
+            margin: 0 auto;
         }
 
         .code-input-row input {
             flex: 1;
-            padding: 10px 14px;
-            background: #0a0a18;
+            padding: 12px 16px;
+            background: #0f0f1f;
             border: 1px solid #2a2a4a;
-            border-radius: 8px;
+            border-radius: 10px;
             color: #eee;
-            font-size: 14px;
+            font-size: 16px;
             font-family: 'Courier New', monospace;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            text-align: center;
         }
 
         .code-input-row input:focus {
             outline: none;
             border-color: #1d9bf0;
+            box-shadow: 0 0 0 3px rgba(29, 155, 240, 0.15);
         }
 
         .code-input-row button {
-            padding: 10px 22px;
+            padding: 12px 28px;
             background: #1d9bf0;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             color: white;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 15px;
             cursor: pointer;
             transition: 0.2s;
             white-space: nowrap;
@@ -189,14 +292,11 @@
             transform: scale(1.02);
         }
 
-        .code-input-row button:active {
-            transform: scale(0.97);
-        }
-
         .code-message {
-            margin-top: 10px;
-            font-size: 13px;
+            margin-top: 14px;
+            font-size: 14px;
             font-weight: 500;
+            min-height: 24px;
         }
 
         .code-message.success {
@@ -211,64 +311,105 @@
             color: #60a5fa;
         }
 
-        .save-btn {
+        /* ===== CONTACT ===== */
+        .contact-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: #1a1a2e;
+            border: 1px solid #2a2a44;
+            border-radius: 10px;
+            color: #eee;
+            font-size: 15px;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus {
+            outline: none;
+            border-color: #1d9bf0;
+        }
+
+        .contact-form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .contact-form button {
             width: 100%;
             padding: 14px;
             background: #1d9bf0;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
             font-weight: 700;
             font-size: 16px;
             cursor: pointer;
-            margin-top: 20px;
-            transition: 0.2s;
+            transition: 0.3s;
         }
 
-        .save-btn:hover {
+        .contact-form button:hover {
             background: #1a8cdb;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(29, 155, 240, 0.25);
         }
 
-        .save-btn:active {
-            transform: translateY(0);
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #556;
+            font-size: 14px;
+            border-top: 1px solid #1a1a30;
+            margin-top: 20px;
         }
 
-        .save-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .footer {
-            margin-top: 25px;
+        footer .secret-hint {
             color: #445;
             font-size: 12px;
-            text-align: center;
-            border-top: 1px solid #1a1a30;
-            padding-top: 20px;
+            margin-top: 8px;
         }
 
-        .footer code {
-            background: #0a0a18;
-            padding: 2px 10px;
+        footer .secret-hint code {
+            background: #0f0f1f;
+            padding: 2px 12px;
             border-radius: 6px;
             color: #6af;
             font-family: 'Courier New', monospace;
             font-size: 13px;
+            letter-spacing: 1px;
         }
 
-        @media (max-width: 500px) {
-            .container {
-                padding: 20px;
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                gap: 12px;
+                padding: 15px 20px;
             }
-            .profile-name {
-                font-size: 24px;
-            }
-            .code-input-row {
+
+            .nav-links {
+                gap: 18px;
                 flex-wrap: wrap;
+                justify-content: center;
             }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .section {
+                padding: 40px 20px;
+            }
+
+            .code-input-row {
+                flex-direction: column;
+            }
+
             .code-input-row button {
                 width: 100%;
             }
@@ -277,92 +418,162 @@
 </head>
 <body>
 
-    <div class="container">
+    <!-- ===== NAVIGATION ===== -->
+    <nav>
+        <div class="logo">My<span>Portfolio</span></div>
+        <ul class="nav-links">
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
 
-        <h1>⚡ Portfolio Builder</h1>
-        <p class="subtitle">Build your profile & unlock the verified badge</p>
+    <!-- ===== HERO ===== -->
+    <section class="hero" id="about">
+        <h1>
+            Hi, I'm <span class="highlight" id="heroName">John Doe</span>
+            <span class="badge-display" id="heroBadge"></span>
+        </h1>
+        <p id="heroBio">A passionate web developer who loves building clean, fast, and user-friendly digital experiences.</p>
+        <a href="#projects" class="btn">View My Work</a>
+    </section>
 
-        <div class="profile-card" id="profileCard">
-            <div class="profile-name" id="displayName">
-                Your Name
-                <span id="badgeContainer"></span>
-            </div>
-            <div class="profile-title" id="displayTitle">Web Developer</div>
-            <div class="profile-bio" id="displayBio">
-                Building cool stuff on the internet.
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="nameInput" placeholder="e.g. Alex Rivera" />
-        </div>
-
-        <div class="form-group">
-            <label>Title</label>
-            <input type="text" id="titleInput" placeholder="e.g. Full-Stack Developer" />
-        </div>
-
-        <div class="form-group">
-            <label>Bio</label>
-            <textarea id="bioInput" placeholder="Tell the world about yourself..."></textarea>
-        </div>
-
+    <!-- ===== SECRET CODE VERIFICATION ===== -->
+    <div class="section">
         <div class="secret-section">
-            <div class="label-sm">🔑 Unlock Verified Badge</div>
+            <h3>🔑 Unlock Verified Badge</h3>
+            <p class="sub">Enter the secret code to get a verified badge on your portfolio</p>
             <div class="code-input-row">
                 <input type="text" id="codeInput" placeholder="Enter secret code" maxlength="20" />
                 <button id="verifyBtn">Verify</button>
             </div>
-            <div id="codeMessage" class="code-message info">
-                🔑 Enter the secret code to unlock your verified badge
+            <div id="codeMessage" class="code-message info">🔑 Enter the secret code to get verified</div>
+        </div>
+    </div>
+
+    <!-- ===== SKILLS ===== -->
+    <section class="section" id="skills">
+        <h2>My <span class="highlight">Skills</span></h2>
+        <div class="skills-grid">
+            <div class="skill-card">
+                <span class="icon">🌐</span>
+                <span class="name">HTML5</span>
+            </div>
+            <div class="skill-card">
+                <span class="icon">🎨</span>
+                <span class="name">CSS3</span>
+            </div>
+            <div class="skill-card">
+                <span class="icon">⚡</span>
+                <span class="name">JavaScript</span>
+            </div>
+            <div class="skill-card">
+                <span class="icon">⚛️</span>
+                <span class="name">React</span>
+            </div>
+            <div class="skill-card">
+                <span class="icon">🟢</span>
+                <span class="name">Node.js</span>
+            </div>
+            <div class="skill-card">
+                <span class="icon">🐍</span>
+                <span class="name">Python</span>
             </div>
         </div>
+    </section>
 
-        <button class="save-btn" id="saveBtn">💾 Save Portfolio</button>
+    <!-- ===== PROJECTS ===== -->
+    <section class="section" id="projects">
+        <h2>My <span class="highlight">Projects</span></h2>
+        <div class="projects-grid">
+            <div class="project-card">
+                <h3>Project One</h3>
+                <p>A modern web app built with React and Node.js</p>
+                <div class="tech">
+                    <span>React</span>
+                    <span>Node.js</span>
+                    <span>MongoDB</span>
+                </div>
+            </div>
+            <div class="project-card">
+                <h3>Project Two</h3>
+                <p>Responsive e-commerce platform with payment integration</p>
+                <div class="tech">
+                    <span>Next.js</span>
+                    <span>Stripe</span>
+                    <span>Tailwind</span>
+                </div>
+            </div>
+            <div class="project-card">
+                <h3>Project Three</h3>
+                <p>Real-time chat application with WebSockets</p>
+                <div class="tech">
+                    <span>Socket.io</span>
+                    <span>Express</span>
+                    <span>Redis</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        <div class="footer">
+    <!-- ===== CONTACT ===== -->
+    <section class="section" id="contact">
+        <h2>Get In <span class="highlight">Touch</span></h2>
+        <div class="contact-form">
+            <input type="text" placeholder="Your Name" />
+            <input type="email" placeholder="Your Email" />
+            <textarea placeholder="Your Message"></textarea>
+            <button>Send Message</button>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <p>© 2026 MyPortfolio. Built with ❤️</p>
+        <div class="secret-hint">
             🔒 Secret code: <code>VERIFY2026</code>
         </div>
-
-    </div>
+    </footer>
 
     <script>
         // ============================================================
-        // THE ONE AND ONLY SECRET CODE
+        // THE SECRET CODE
         // ============================================================
         const SECRET_CODE = "VERIFY2026";
 
         let isVerified = false;
 
-        const nameInput = document.getElementById('nameInput');
-        const titleInput = document.getElementById('titleInput');
-        const bioInput = document.getElementById('bioInput');
-        const displayName = document.getElementById('displayName');
-        const displayTitle = document.getElementById('displayTitle');
-        const displayBio = document.getElementById('displayBio');
-        const badgeContainer = document.getElementById('badgeContainer');
+        // ============================================================
+        // DOM REFS
+        // ============================================================
+        const heroName = document.getElementById('heroName');
+        const heroBadge = document.getElementById('heroBadge');
+        const heroBio = document.getElementById('heroBio');
         const codeInput = document.getElementById('codeInput');
         const verifyBtn = document.getElementById('verifyBtn');
         const codeMessage = document.getElementById('codeMessage');
-        const saveBtn = document.getElementById('saveBtn');
 
-        function updateProfile() {
-            const name = nameInput.value.trim() || 'Your Name';
-            const title = titleInput.value.trim() || 'Web Developer';
-            const bio = bioInput.value.trim() || 'Building cool stuff on the internet.';
-
-            displayName.innerHTML = `${name} ${isVerified ? '<span class="verified-badge">✅ Verified</span>' : ''}`;
-            displayTitle.textContent = title;
-            displayBio.textContent = bio;
+        // ============================================================
+        // UPDATE HERO WITH BADGE
+        // ============================================================
+        function updateHero() {
+            if (isVerified) {
+                heroBadge.innerHTML = '<span class="verified-badge">✅ Verified</span>';
+            } else {
+                heroBadge.innerHTML = '';
+            }
         }
 
+        // ============================================================
+        // VERIFY CODE
+        // ============================================================
         function verifyCode() {
             const entered = codeInput.value.trim();
 
             if (!entered) {
                 codeMessage.className = 'code-message info';
-                codeMessage.innerHTML = '🔑 Enter the secret code to unlock your verified badge';
+                codeMessage.innerHTML = '🔑 Enter the secret code to get verified';
                 return;
             }
 
@@ -370,71 +581,39 @@
                 isVerified = true;
                 codeMessage.className = 'code-message success';
                 codeMessage.innerHTML = '✅ Verified! Your badge has been unlocked. 🎉';
-                updateProfile();
+                updateHero();
+                // Save to localStorage
+                localStorage.setItem('verified', 'true');
+                localStorage.setItem('codeUsed', entered);
             } else {
                 isVerified = false;
                 codeMessage.className = 'code-message error';
                 codeMessage.innerHTML = '❌ Invalid code. Try again.';
-                updateProfile();
+                updateHero();
+                localStorage.removeItem('verified');
+                localStorage.removeItem('codeUsed');
             }
         }
 
-        function savePortfolio() {
-            saveBtn.textContent = '💾 Saving...';
-            saveBtn.disabled = true;
+        // ============================================================
+        // LOAD SAVED VERIFICATION
+        // ============================================================
+        function loadSavedVerification() {
+            const saved = localStorage.getItem('verified');
+            const savedCode = localStorage.getItem('codeUsed');
 
-            setTimeout(() => {
-                const data = {
-                    name: nameInput.value.trim(),
-                    title: titleInput.value.trim(),
-                    bio: bioInput.value.trim(),
-                    verified: isVerified,
-                    codeUsed: codeInput.value.trim()
-                };
-                localStorage.setItem('portfolioData', JSON.stringify(data));
-
-                saveBtn.textContent = '✅ Saved!';
-                saveBtn.style.background = '#4ade80';
-                saveBtn.style.color = '#0f0f1a';
-
-                setTimeout(() => {
-                    saveBtn.textContent = '💾 Save Portfolio';
-                    saveBtn.style.background = '#1d9bf0';
-                    saveBtn.style.color = 'white';
-                    saveBtn.disabled = false;
-                }, 1500);
-
-                alert('🎉 Portfolio saved successfully!\n\n' +
-                    `Name: ${data.name || 'Not set'}\n` +
-                    `Title: ${data.title || 'Not set'}\n` +
-                    `Verified: ${data.verified ? '✅ Yes' : '❌ No'}`);
-            }, 800);
-        }
-
-        function loadSavedData() {
-            const saved = localStorage.getItem('portfolioData');
-            if (!saved) return;
-
-            try {
-                const data = JSON.parse(saved);
-                nameInput.value = data.name || '';
-                titleInput.value = data.title || '';
-                bioInput.value = data.bio || '';
-                if (data.verified) {
-                    isVerified = true;
-                    codeInput.value = data.codeUsed || '';
-                    codeMessage.className = 'code-message success';
-                    codeMessage.innerHTML = '✅ Previously verified! Badge restored. 🎉';
-                }
-                updateProfile();
-            } catch (e) {
-                // ignore
+            if (saved === 'true' && savedCode === SECRET_CODE) {
+                isVerified = true;
+                codeInput.value = savedCode;
+                codeMessage.className = 'code-message success';
+                codeMessage.innerHTML = '✅ Previously verified! Badge restored. 🎉';
+                updateHero();
             }
         }
 
-        nameInput.addEventListener('input', updateProfile);
-        titleInput.addEventListener('input', updateProfile);
-        bioInput.addEventListener('input', updateProfile);
+        // ============================================================
+        // EVENT LISTENERS
+        // ============================================================
         verifyBtn.addEventListener('click', verifyCode);
 
         codeInput.addEventListener('keydown', (e) => {
@@ -444,10 +623,11 @@
             }
         });
 
-        saveBtn.addEventListener('click', savePortfolio);
-
-        loadSavedData();
-        updateProfile();
+        // ============================================================
+        // INIT
+        // ============================================================
+        loadSavedVerification();
+        updateHero();
 
         console.log('🚀 Portfolio loaded!');
         console.log('🔑 Secret code:', SECRET_CODE);
