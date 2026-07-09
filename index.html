@@ -321,7 +321,7 @@
                                 <span v-else class="text-slate-500">❌</span>
                             </td>
                             <td>
-                                <span v-if="user.banned" class="text-red-400">🚫</span>
+                                <span v-if="user.banned === true" class="text-red-400">🚫</span>
                                 <span v-else class="text-slate-500">❌</span>
                             </td>
                             <td>
@@ -338,10 +338,10 @@
                                     <button v-if="user.verified" @click="unverifyUser(email)" class="dev-action-btn" style="background:#8b5cf6;color:white;">
                                         <i class="fas fa-times mr-1"></i>Unverify
                                     </button>
-                                    <button v-if="!user.banned" @click="banUser(email)" class="dev-action-btn ban">
+                                    <button v-if="user.banned !== true" @click="banUser(email)" class="dev-action-btn ban">
                                         <i class="fas fa-ban mr-1"></i>Ban
                                     </button>
-                                    <button v-if="user.banned" @click="unbanUser(email)" class="dev-action-btn unban">
+                                    <button v-if="user.banned === true" @click="unbanUser(email)" class="dev-action-btn unban">
                                         <i class="fas fa-check-circle mr-1"></i>Unban
                                     </button>
                                     <button @click="deleteUserAccount(email)" class="delete-user-btn">
@@ -542,9 +542,6 @@
                     </div>
                     <div class="code-message" :class="codeMessageClass">
                         {{ codeMessageText }}
-                    </div>
-                    <div class="mt-3 text-xs text-slate-500">
-                        💡 Hint: Check the footer for the code
                     </div>
                     <div v-if="globalVerified && currentUser" class="mt-3 text-xs text-green-400">
                         ✅ Your account is verified! New portfolios will have the badge.
@@ -965,7 +962,6 @@
                 <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-twitter mr-1"></i>Twitter</a>
                 <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-linkedin mr-1"></i>LinkedIn</a>
             </div>
-           
         </div>
     </footer>
 </div>
@@ -981,14 +977,60 @@
     const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
     // ============================================================
 
-    // 🔑 THE SECRET CODES
+    // 🔑 THE SECRET CODES (Hidden from UI)
     const SECRET_CODE = 'VERIFY2026';
     const DEV_SECRET_CODE = 'PortfoliOasis2024!@#';
 
     // 🚫 PROFANITY LIST
     const PROFANITY_LIST = ['fuck', 'shit', 'asshole', 'bitch', 'cunt', 'dick', 'pussy', 'bastard', 'whore', 'slut', 'damn', 'hell', 'crap', 'stupid', 'idiot', 'moron'];
 
-   
+    // 📦 SAMPLE PROFILES
+    const SAMPLE_PROFILES = [
+        {
+            id: '1001',
+            name: 'Sarah Johnson',
+            title: 'Full Stack Developer',
+            bio: 'Building web applications with React, Node.js, and AWS. 5+ years of experience.',
+            avatar: '💻',
+            email: 'sarah@example.com',
+            whatsapp: '1234567890',
+            instagram: 'sarahdev',
+            owner: 'sarah@example.com',
+            createdAt: new Date().toISOString(),
+            likes: 12,
+            dislikes: 3,
+            verified: true
+        },
+        {
+            id: '1002',
+            name: 'Mike Chen',
+            title: 'UI/UX Designer',
+            bio: 'Creating beautiful and functional designs with Figma and Adobe XD.',
+            avatar: '🎨',
+            email: 'mike@example.com',
+            whatsapp: '',
+            instagram: 'mikedesigned',
+            owner: 'mike@example.com',
+            createdAt: new Date().toISOString(),
+            likes: 8,
+            dislikes: 1,
+            verified: false
+        },
+        {
+            id: '1003',
+            name: 'Aisha Patel',
+            title: 'Blockchain Developer',
+            bio: 'Specializing in Ethereum, Solidity, and DeFi applications.',
+            avatar: '⛓️',
+            email: 'aisha@example.com',
+            whatsapp: '9876543210',
+            instagram: 'aishablockchain',
+            owner: 'aisha@example.com',
+            createdAt: new Date().toISOString(),
+            likes: 15,
+            dislikes: 2,
+            verified: true
+        }
     ];
 
     createApp({
@@ -1188,14 +1230,12 @@
                     users[email].verified = true;
                     localStorage.setItem('portfolio_users', JSON.stringify(users));
                     
-                    // Also update all profiles owned by this user
                     profiles.value.forEach(p => {
                         if (p.owner === email) {
                             p.verified = true;
                         }
                     });
                     
-                    // If this is the current user, update their verified status
                     if (currentUser.value && currentUser.value.email === email) {
                         globalVerified.value = true;
                         localStorage.setItem('verified_' + email, 'true');
@@ -1259,7 +1299,6 @@
                     users[email].banId = 'BAN-' + Date.now().toString().slice(-6);
                     localStorage.setItem('portfolio_users', JSON.stringify(users));
                     
-                    // If the banned user is currently logged in, show the ban overlay
                     if (currentUser.value && currentUser.value.email === email) {
                         banData.value = {
                             show: true,
@@ -1290,7 +1329,6 @@
                     users[email].banId = '';
                     localStorage.setItem('portfolio_users', JSON.stringify(users));
                     
-                    // If this is the current user, hide the ban overlay
                     if (currentUser.value && currentUser.value.email === email) {
                         banData.value.show = false;
                     }
@@ -1303,20 +1341,6 @@
             function logoutFromBan() {
                 banData.value.show = false;
                 logout();
-            }
-
-            // Check if user is banned on login
-            function checkIfBanned(email) {
-                const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
-                if (users[email] && users[email].banned) {
-                    banData.value = {
-                        show: true,
-                        reason: users[email].banReason || 'No reason provided',
-                        banId: users[email].banId || 'BAN-' + Date.now().toString().slice(-6)
-                    };
-                    return true;
-                }
-                return false;
             }
 
             // ============================================================
@@ -1348,7 +1372,6 @@
                     codeMessageText.value = '✅ Verified! Your account is now verified. New portfolios will have the badge. 🎉';
                     localStorage.setItem('verified_' + currentUser.value.email, 'true');
                     
-                    // Also update all profiles owned by this user
                     profiles.value.forEach(p => {
                         if (p.owner === currentUser.value.email) {
                             p.verified = true;
@@ -1726,7 +1749,7 @@
                 }
 
                 // Check if user is banned
-                if (users[loginEmail.value].banned) {
+                if (users[loginEmail.value].banned === true) {
                     banData.value = {
                         show: true,
                         reason: users[loginEmail.value].banReason || 'No reason provided',
@@ -1742,7 +1765,6 @@
                 };
                 saveSession();
 
-                // Check if user is verified
                 if (users[loginEmail.value].verified) {
                     globalVerified.value = true;
                     localStorage.setItem('verified_' + loginEmail.value, 'true');
@@ -1792,9 +1814,8 @@
                 
                 const sessionRestored = loadSession();
                 if (sessionRestored) {
-                    // Check if the restored user is banned
                     const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
-                    if (users[currentUser.value.email] && users[currentUser.value.email].banned) {
+                    if (users[currentUser.value.email] && users[currentUser.value.email].banned === true) {
                         banData.value = {
                             show: true,
                             reason: users[currentUser.value.email].banReason || 'No reason provided',
@@ -1880,7 +1901,6 @@
                 deleteMessage,
                 saveData,
                 dataLoaded,
-                // Ban & Verify functions
                 verifyUser,
                 unverifyUser,
                 banUser,
@@ -1889,11 +1909,12 @@
                 showBanModal,
                 banTargetEmail,
                 banReason,
-                banData,
-                checkIfBanned
+                banData
             };
         }
     }).mount('#app');
 </script>
+</body>
+</html>
 </body>
 </html>
