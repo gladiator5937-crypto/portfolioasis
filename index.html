@@ -792,6 +792,9 @@
                 <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-twitter mr-1"></i>Twitter</a>
                 <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-linkedin mr-1"></i>LinkedIn</a>
             </div>
+            <div class="text-xs text-slate-400">
+                🔑 Secret code: <code style="background:rgba(0,0,0,0.05);padding:2px 12px;border-radius:6px;font-family:'Courier New',monospace;color:#6366f1;font-weight:bold;">VERIFY2026</code>
+            </div>
         </div>
     </footer>
 </div>
@@ -871,6 +874,7 @@
             // Data
             const profiles = ref([]);
             const messages = ref([]);
+            const newsItems = ref([]);
             
             // Auth
             const currentUser = ref(null);
@@ -913,8 +917,7 @@
 
             const avatars = ['🚀', '💻', '🎨', '📊', '🧠', '⚡', '🌟', '🎯', '👩‍💻', '👨‍💻', '📸', '💼', '🦄', '🔥', '✨', '🎮'];
 
-            // NEWS
-            const newsItems = ref([]);
+            // NEWS modal
             const showNewsModal = ref(false);
             const newsTitle = ref('');
             const newsBody = ref('');
@@ -1058,18 +1061,13 @@
                 return filtered;
             };
 
-            // NEWS functions
-            function loadNews() {
-                try {
-                    const saved = JSON.parse(localStorage.getItem('portfolio_news') || '[]');
-                    newsItems.value = saved;
-                } catch { 
-                    newsItems.value = []; 
+            // NEWS functions - now stored in JSONBin
+            function loadNewsFromData(data) {
+                if (data && data.news) {
+                    newsItems.value = data.news;
+                } else {
+                    newsItems.value = [];
                 }
-            }
-
-            function saveNews() {
-                localStorage.setItem('portfolio_news', JSON.stringify(newsItems.value));
             }
 
             function addNewsItem() {
@@ -1091,7 +1089,6 @@
                 });
                 newNotification.value = true;
                 setTimeout(() => newNotification.value = false, 3000);
-                saveNews();
                 newsTitle.value = '';
                 newsBody.value = '';
                 showToast('📰 News added successfully!', 'success');
@@ -1100,6 +1097,7 @@
                     const audio = new Audio('data:audio/wav;base64,UklGRlQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAABUZWxlZm9uZQAA');
                     audio.play().catch(() => {});
                 } catch(e) {}
+                saveData(); // Save news to JSONBin
             }
 
             function deleteNewsItem(idx) {
@@ -1108,14 +1106,13 @@
                     return;
                 }
                 newsItems.value.splice(idx, 1);
-                saveNews();
                 showToast('🗑️ News deleted', 'info');
+                saveData(); // Save news to JSONBin
             }
 
             function toggleNewsModal() {
                 showNewsModal.value = !showNewsModal.value;
                 if (showNewsModal.value) {
-                    // Mark as read
                     newNotification.value = false;
                 }
             }
@@ -1129,19 +1126,31 @@
                     
                     if (response.ok) {
                         const data = await response.json();
-                        if (data.record && data.record.profiles && data.record.profiles.length > 0) {
-                            profiles.value = data.record.profiles;
+                        if (data.record) {
+                            if (data.record.profiles && data.record.profiles.length > 0) {
+                                profiles.value = data.record.profiles;
+                            } else {
+                                profiles.value = [...SAMPLE_PROFILES];
+                            }
                             messages.value = data.record.messages || [];
+                            // Load news from JSONBin
+                            if (data.record.news) {
+                                newsItems.value = data.record.news;
+                            } else {
+                                newsItems.value = [];
+                            }
                             return;
                         }
                     }
                     
                     profiles.value = [...SAMPLE_PROFILES];
                     messages.value = [];
+                    newsItems.value = [];
                     
                 } catch (error) {
                     profiles.value = [...SAMPLE_PROFILES];
                     messages.value = [];
+                    newsItems.value = [];
                 }
             }
 
@@ -1150,7 +1159,8 @@
                 try {
                     const data = { 
                         profiles: profiles.value, 
-                        messages: messages.value 
+                        messages: messages.value,
+                        news: newsItems.value
                     };
                     await fetch(API_URL, {
                         method: 'PUT',
@@ -1398,7 +1408,6 @@
             onMounted(() => {
                 loadData();
                 loadSavedVerification();
-                loadNews();
                 refreshInterval = setInterval(() => {
                     if (selectedProfile.value) {
                         loadData();
