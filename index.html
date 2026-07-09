@@ -14,6 +14,7 @@
         @keyframes bellRing { 0%,100%{transform:rotate(0)} 25%{transform:rotate(10deg)} 75%{transform:rotate(-10deg)} }
         @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
         @keyframes shake { 0%,100%{transform:translateX(0)} 10%,30%,50%,70%,90%{transform:translateX(-10px)} 20%,40%,60%,80%{transform:translateX(10px)} }
+        @keyframes likePop { 0%{transform:scale(0); opacity:0} 60%{transform:scale(1.3)} 100%{transform:scale(1); opacity:1} }
         .animate-float { animation: float 3s ease-in-out infinite; }
         .animate-slide-in { animation: slideIn 0.5s ease-out forwards; }
         .glass-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); }
@@ -61,22 +62,22 @@
         .chat-message:hover { background: #f8fafc; }
         .owner-badge { background: rgba(99,102,241,0.15); color: #6366f1; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; }
         .verified-profile-badge { background: #1d9bf0; color: white; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; display:inline-flex; align-items:center; gap:4px; }
-        .ban-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:99999; display:flex; align-items:center; justify-content:center; animation:shake 0.5s ease-in-out; }
-        .ban-card { background:linear-gradient(135deg,#1a1a2e,#16213e); border:2px solid #ef4444; border-radius:30px; padding:50px; max-width:600px; width:90%; text-align:center; box-shadow:0 0 80px rgba(239,68,68,0.3); }
-        .ban-card .ban-icon { font-size:80px; color:#ef4444; margin-bottom:20px; animation:pulse 1.5s infinite; }
-        .ban-card h1 { color:#ef4444; font-size:32px; font-weight:800; margin-bottom:10px; }
-        .ban-card p { color:#94a3b8; font-size:16px; line-height:1.6; }
-        .ban-card .ban-reason { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:12px; padding:15px; margin:15px 0; color:#fca5a5; font-size:14px; }
-        .ban-card .ban-id { color:#64748b; font-size:12px; font-family:monospace; margin-top:10px; }
-        .dev-action-btn { padding:6px 16px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; border:none; }
-        .dev-action-btn.verify { background:#6366f1; color:white; }
-        .dev-action-btn.verify:hover { background:#4f46e5; transform:scale(1.05); }
-        .dev-action-btn.ban { background:#ef4444; color:white; }
-        .dev-action-btn.ban:hover { background:#dc2626; transform:scale(1.05); }
-        .dev-action-btn.unban { background:#22c55e; color:white; }
-        .dev-action-btn.unban:hover { background:#16a34a; transform:scale(1.05); }
         .liked { color: #6366f1 !important; }
         .disliked { color: #ef4444 !important; }
+        .like-btn-card { padding: 4px 10px; border-radius: 20px; border: 1px solid #e2e8f0; background: white; transition: all 0.2s; font-size: 12px; display:inline-flex; align-items:center; gap:4px; }
+        .like-btn-card:hover:not(:disabled) { border-color: #6366f1; background: #eef2ff; }
+        .like-btn-card.liked { border-color: #6366f1; background: #eef2ff; color: #6366f1; }
+        .like-btn-card.disliked { border-color: #ef4444; background: #fef2f2; color: #ef4444; }
+        .like-btn-card:disabled { opacity: 0.5; cursor: not-allowed; }
+        .like-count { font-weight: 600; color: #475569; min-width: 20px; text-align: center; }
+        .dislike-count { font-weight: 600; color: #475569; min-width: 20px; text-align: center; }
+        .auto-verified-badge { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 2px 10px; border-radius: 12px; font-size: 9px; font-weight: 700; display:inline-flex; align-items:center; gap:4px; letter-spacing:0.3px; text-transform:uppercase; }
+        .banned-profile-badge { background: #ef4444; color: white; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; display:inline-flex; align-items:center; gap:4px; }
+        .banned-overlay-card { position: relative; opacity: 0.7; }
+        .banned-overlay-card::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, rgba(239,68,68,0.05), rgba(239,68,68,0.05) 10px, rgba(239,68,68,0.02) 10px, rgba(239,68,68,0.02) 20px); border-radius: 16px; pointer-events: none; }
+        .banned-owner-badge { background: #ef4444; color: white; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; display:inline-flex; align-items:center; gap:4px; }
+        .like-sparkle { animation: likePop 0.4s ease-out; }
+        .banned-text { color: #ef4444; text-decoration: line-through; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen">
@@ -377,6 +378,7 @@
                                     <span class="font-bold text-slate-800">{{ profile.name }}</span>
                                     <span class="text-xs text-indigo-600">{{ profile.title }}</span>
                                     <span v-if="profile.verified" class="verified-profile-badge"><i class="fas fa-check-circle"></i> Verified</span>
+                                    <span v-if="isUserBanned(profile.owner)" class="banned-profile-badge"><i class="fas fa-ban"></i> Banned User</span>
                                 </div>
                                 <p class="text-sm text-slate-500 mt-1">{{ profile.bio }}</p>
                                 <div class="flex gap-2 mt-2">
@@ -455,7 +457,7 @@
                     </div>
                 </div>
 
-                <!-- Profile Cards -->
+                <!-- Profile Cards with Banned Indicator -->
                 <div v-if="filteredProfiles.length === 0" class="text-center py-20">
                     <div class="text-6xl mb-4">🔍</div>
                     <h3 class="text-2xl font-bold text-slate-700">No profiles found</h3>
@@ -464,53 +466,64 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div v-for="(profile, index) in filteredProfiles" :key="profile.id"
-                         @click="selectProfile(profile)"
-                         class="card-hover bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/30 shadow-lg cursor-pointer animate-slide-in"
-                         :style="{ animationDelay: (index * 0.05) + 's' }">
+                         class="card-hover bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-white/30 shadow-lg animate-slide-in relative"
+                         :class="isUserBanned(profile.owner) ? 'banned-overlay-card' : ''"
+                         :style="{ animationDelay: (index * 0.05) + 's' }"
+                         @click="!isUserBanned(profile.owner) && selectProfile(profile)">
                         
                         <div class="flex items-start gap-4">
-                            <div class="profile-avatar w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-3xl flex-shrink-0 shadow-inner">
+                            <div class="profile-avatar w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center text-3xl flex-shrink-0 shadow-inner cursor-pointer" @click="!isUserBanned(profile.owner) && selectProfile(profile)">
                                 {{ profile.avatar || '🚀' }}
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between items-start">
-                                    <div>
-                                        <h3 class="font-bold text-slate-900 text-lg truncate">{{ profile.name }}</h3>
+                                    <div class="cursor-pointer" @click="!isUserBanned(profile.owner) && selectProfile(profile)">
+                                        <h3 class="font-bold text-slate-900 text-lg truncate" :class="isUserBanned(profile.owner) ? 'banned-text' : ''">
+                                            {{ profile.name }}
+                                            <span v-if="isUserBanned(profile.owner)" class="text-xs text-red-500 ml-1">🚫</span>
+                                        </h3>
                                         <p class="text-xs font-semibold text-indigo-600">{{ profile.title }}</p>
                                     </div>
                                     <div class="flex flex-col items-end gap-1">
-                                        <span v-if="profile.verified" class="verified-profile-badge text-xs">
+                                        <span v-if="isUserBanned(profile.owner)" class="banned-profile-badge text-xs">
+                                            <i class="fas fa-ban"></i> Banned
+                                        </span>
+                                        <span v-else-if="profile.verified" class="verified-profile-badge text-xs">
                                             <i class="fas fa-check-circle"></i> Verified
                                         </span>
-                                        <span v-if="isDev || (currentUser && profile.owner === currentUser.email)" class="text-xs owner-badge">
+                                        <span v-if="profile.likes >= 50" class="auto-verified-badge text-xs">
+                                            <i class="fas fa-star"></i> Auto-Verified
+                                        </span>
+                                        <span v-if="!isUserBanned(profile.owner) && (isDev || (currentUser && profile.owner === currentUser.email))" class="text-xs owner-badge">
                                             <i class="fas fa-user-edit mr-1"></i>Yours
                                         </span>
                                     </div>
                                 </div>
-                                <p class="text-sm text-slate-500 mt-2 line-clamp-2">{{ profile.bio }}</p>
-                                <div class="flex gap-2 mt-3 flex-wrap">
-                                    <span v-if="profile.email" class="text-xs bg-slate-100 px-2 py-1 rounded-full">
-                                        <i class="fas fa-envelope text-slate-400 mr-1"></i>Email
-                                    </span>
-                                    <span v-if="profile.whatsapp" class="text-xs bg-green-50 text-green-600 px-2 py-1 rounded-full">
-                                        <i class="fab fa-whatsapp mr-1"></i>WhatsApp
-                                    </span>
-                                    <span v-if="profile.instagram" class="text-xs bg-pink-50 text-pink-600 px-2 py-1 rounded-full">
-                                        <i class="fab fa-instagram mr-1"></i>Instagram
-                                    </span>
-                                    <span class="text-xs bg-slate-50 px-2 py-1 rounded-full">
-                                        <i class="far fa-clock text-slate-400 mr-1"></i>
-                                        {{ new Date(profile.createdAt).toLocaleDateString() }}
-                                    </span>
-                                    <span class="text-xs bg-indigo-50 text-indigo-600 px-2 py-1 rounded-full">
-                                        <i class="fas fa-thumbs-up mr-1"></i>{{ profile.likes || 0 }}
-                                    </span>
-                                    <span class="text-xs bg-red-50 text-red-600 px-2 py-1 rounded-full">
-                                        <i class="fas fa-thumbs-down mr-1"></i>{{ profile.dislikes || 0 }}
-                                    </span>
-                                    <span v-if="getUserProfileCount(profile.owner) > 1" class="text-xs bg-amber-50 text-amber-600 px-2 py-1 rounded-full">
-                                        <i class="fas fa-layer-group mr-1"></i>{{ getUserProfileCount(profile.owner) }} portfolios
-                                    </span>
+                                <p class="text-sm text-slate-500 mt-2 line-clamp-2 cursor-pointer" @click="!isUserBanned(profile.owner) && selectProfile(profile)">
+                                    {{ isUserBanned(profile.owner) ? '⚠️ This portfolio belongs to a banned user.' : profile.bio }}
+                                </p>
+                                
+                                <!-- Like/Dislike Buttons on Card (disabled for banned users) -->
+                                <div class="flex items-center gap-3 mt-3">
+                                    <button @click.stop="!isUserBanned(profile.owner) && quickLike(profile.id)" 
+                                            :disabled="!currentUser || profile.owner === currentUser.email || isUserBanned(profile.owner)"
+                                            class="like-btn-card"
+                                            :class="isLikedByUser(profile.id) ? 'liked' : ''">
+                                        <i class="fas fa-thumbs-up"></i>
+                                        <span class="like-count">{{ profile.likes || 0 }}</span>
+                                    </button>
+                                    <button @click.stop="!isUserBanned(profile.owner) && quickDislike(profile.id)"
+                                            :disabled="!currentUser || profile.owner === currentUser.email || isUserBanned(profile.owner)"
+                                            class="like-btn-card"
+                                            :class="isDislikedByUser(profile.id) ? 'disliked' : ''">
+                                        <i class="fas fa-thumbs-down"></i>
+                                        <span class="dislike-count">{{ profile.dislikes || 0 }}</span>
+                                    </button>
+                                    <span v-if="isUserBanned(profile.owner)" class="text-xs text-red-500">Banned</span>
+                                    <span v-else-if="!currentUser" class="text-xs text-slate-400">Login to like</span>
+                                    <span v-else-if="currentUser && profile.owner === currentUser.email" class="text-xs text-slate-400">Your own</span>
+                                    <span v-else-if="currentUser && profile.owner !== currentUser.email && isLikedByUser(profile.id)" class="text-xs text-indigo-500">Liked!</span>
+                                    <span v-else-if="currentUser && profile.owner !== currentUser.email && isDislikedByUser(profile.id)" class="text-xs text-red-500">Disliked!</span>
                                 </div>
                             </div>
                         </div>
@@ -541,10 +554,13 @@
                     <div v-if="globalVerified && currentUser" class="mt-3 text-xs text-green-400">
                         ✅ Your account is verified! New portfolios will have the badge.
                     </div>
+                    <div class="mt-3 text-xs text-amber-400">
+                        ⭐ Portfolios with 50+ likes are automatically verified!
+                    </div>
                 </div>
 
-                <!-- Selected Profile Card -->
-                <div v-if="selectedProfile" class="sticky top-28">
+                <!-- Selected Profile Card (only if not banned) -->
+                <div v-if="selectedProfile && !isUserBanned(selectedProfile.owner)" class="sticky top-28">
                     <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
                         <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white">
                             <div class="flex justify-between items-start">
@@ -557,6 +573,9 @@
                                         <p class="text-sm text-white/80">{{ selectedProfile.title }}</p>
                                         <span v-if="selectedProfile.verified" class="verified-badge mt-1 inline-block">
                                             ✅ Verified
+                                        </span>
+                                        <span v-if="selectedProfile.likes >= 50" class="auto-verified-badge mt-1 inline-block">
+                                            <i class="fas fa-star"></i> Auto-Verified (50+ likes)
                                         </span>
                                         <span v-if="currentUser && selectedProfile.owner === currentUser.email" class="inline-block mt-1 text-xs bg-white/20 px-2 py-0.5 rounded-full">
                                             <i class="fas fa-user-edit mr-1"></i>Your portfolio
@@ -597,16 +616,16 @@
                                 </div>
                             </div>
 
-                            <!-- Like / Dislike with proper restrictions -->
+                            <!-- Like / Dislike -->
                             <div class="border-t pt-4">
                                 <div class="flex items-center gap-6">
                                     <div class="flex items-center gap-2">
                                         <button @click="likeProfile(selectedProfile.id)" 
-                                                :disabled="!currentUser || selectedProfile.owner === currentUser.email"
+                                                :disabled="!currentUser || selectedProfile.owner === currentUser.email || isUserBanned(selectedProfile.owner)"
                                                 class="like-btn text-xl transition"
                                                 :class="[
                                                     isLikedByUser(selectedProfile.id) ? 'liked' : 'text-slate-400 hover:text-indigo-600',
-                                                    (!currentUser || selectedProfile.owner === currentUser.email) ? 'opacity-50 cursor-not-allowed' : ''
+                                                    (!currentUser || selectedProfile.owner === currentUser.email || isUserBanned(selectedProfile.owner)) ? 'opacity-50 cursor-not-allowed' : ''
                                                 ]">
                                             <i class="fas fa-thumbs-up"></i>
                                         </button>
@@ -614,11 +633,11 @@
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <button @click="dislikeProfile(selectedProfile.id)"
-                                                :disabled="!currentUser || selectedProfile.owner === currentUser.email"
+                                                :disabled="!currentUser || selectedProfile.owner === currentUser.email || isUserBanned(selectedProfile.owner)"
                                                 class="like-btn text-xl transition"
                                                 :class="[
                                                     isDislikedByUser(selectedProfile.id) ? 'disliked' : 'text-slate-400 hover:text-red-600',
-                                                    (!currentUser || selectedProfile.owner === currentUser.email) ? 'opacity-50 cursor-not-allowed' : ''
+                                                    (!currentUser || selectedProfile.owner === currentUser.email || isUserBanned(selectedProfile.owner)) ? 'opacity-50 cursor-not-allowed' : ''
                                                 ]">
                                             <i class="fas fa-thumbs-down"></i>
                                         </button>
@@ -639,6 +658,9 @@
                                 </div>
                                 <div v-if="currentUser && hasDislikedProfile(selectedProfile.id) && !isDev" class="text-xs text-red-500 mt-1">
                                     <i class="fas fa-check-circle mr-1"></i>You already disliked this profile
+                                </div>
+                                <div v-if="selectedProfile.likes >= 50" class="text-xs text-amber-600 mt-1">
+                                    <i class="fas fa-star mr-1"></i>This portfolio is Auto-Verified (50+ likes!)
                                 </div>
                             </div>
 
@@ -741,6 +763,39 @@
                     </div>
                 </div>
 
+                <!-- Banned Profile Message -->
+                <div v-else-if="selectedProfile && isUserBanned(selectedProfile.owner)" class="sticky top-28">
+                    <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-red-300 overflow-hidden">
+                        <div class="bg-gradient-to-br from-red-600 to-red-700 p-6 text-white">
+                            <div class="flex justify-between items-start">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-20 h-20 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-4xl">
+                                        🚫
+                                    </div>
+                                    <div>
+                                        <h2 class="text-xl font-bold">{{ selectedProfile.name }}</h2>
+                                        <p class="text-sm text-white/80">{{ selectedProfile.title }}</p>
+                                        <span class="inline-block mt-1 text-xs bg-red-800/50 px-3 py-1 rounded-full">
+                                            <i class="fas fa-ban mr-1"></i> This portfolio belongs to a banned user
+                                        </span>
+                                    </div>
+                                </div>
+                                <button @click="selectedProfile = null" class="text-white/60 hover:text-white transition-colors">
+                                    <i class="fas fa-times text-xl"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6 text-center py-12">
+                            <div class="text-6xl mb-4">🚫</div>
+                            <h3 class="text-xl font-bold text-slate-700">This portfolio is unavailable</h3>
+                            <p class="text-slate-400 mt-2">The owner of this portfolio has been banned from the platform.</p>
+                            <button @click="selectedProfile = null" class="mt-4 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors">
+                                <i class="fas fa-arrow-left mr-2"></i>Go Back
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Add Profile Form -->
                 <div v-else class="sticky top-28">
                     <div class="glass-card rounded-3xl shadow-2xl p-6 border border-white/30">
@@ -755,6 +810,9 @@
                             </p>
                             <p v-if="globalVerified && currentUser" class="text-xs text-green-600 mt-1">
                                 <i class="fas fa-check-circle mr-1"></i> Your account is verified! Your new portfolio will have the badge.
+                            </p>
+                            <p class="text-xs text-amber-600 mt-1">
+                                <i class="fas fa-star mr-1"></i> Portfolios with 50+ likes get Auto-Verified!
                             </p>
                         </div>
 
@@ -993,6 +1051,7 @@
     // 🔑 THE SECRET CODES (Hidden from UI)
     const SECRET_CODE = 'VERIFY2026';
     const DEV_SECRET_CODE = 'PortfoliOasis2024!@#';
+    const AUTO_VERIFY_THRESHOLD = 50;
 
     // 🚫 PROFANITY LIST
     const PROFANITY_LIST = ['fuck', 'shit', 'asshole', 'bitch', 'cunt', 'dick', 'pussy', 'bastard', 'whore', 'slut', 'damn', 'hell', 'crap', 'stupid', 'idiot', 'moron'];
@@ -1091,6 +1150,9 @@
             const showBanModal = ref(false);
             const banTargetEmail = ref('');
             const banReason = ref('');
+            
+            // Banned Users Cache
+            const bannedUsers = ref({});
 
             // Secret Code
             const secretCodeInput = ref('');
@@ -1148,13 +1210,36 @@
                 setTimeout(() => { toast.value.show = false; }, 4000);
             }
 
+            // ============================================================
+            // BANNED USER CHECK
+            // ============================================================
+            function isUserBanned(email) {
+                if (!email) return false;
+                // Check cache first
+                if (bannedUsers.value[email] !== undefined) {
+                    return bannedUsers.value[email];
+                }
+                // Check localStorage
+                const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                const isBanned = users[email] && users[email].banned === true;
+                bannedUsers.value[email] = isBanned;
+                return isBanned;
+            }
+
+            function refreshBannedCache() {
+                const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                Object.keys(users).forEach(email => {
+                    bannedUsers.value[email] = users[email].banned === true;
+                });
+            }
+
             // Get user profile count
             function getUserProfileCount(email) {
                 if (!email) return 0;
                 return profiles.value.filter(p => p.owner === email).length;
             }
 
-            // Get user profiles
+            // Get user profiles (excluding banned ones for non-dev users)
             function getUserProfiles(email) {
                 return profiles.value.filter(p => p.owner === email);
             }
@@ -1179,10 +1264,21 @@
             };
 
             // ============================================================
+            // AUTO-VERIFY FUNCTION
+            // ============================================================
+            function checkAndAutoVerify(profile) {
+                if (profile.likes >= AUTO_VERIFY_THRESHOLD && !profile.verified) {
+                    profile.verified = true;
+                    showToast(`⭐ "${profile.name}" is now Auto-Verified (${profile.likes} likes)!`, 'success');
+                    return true;
+                }
+                return false;
+            }
+
+            // ============================================================
             // LIKE / DISLIKE FUNCTIONS with restrictions
             // ============================================================
             
-            // Check if user has liked a profile
             function isLikedByUser(profileId) {
                 if (!currentUser.value) return false;
                 const profile = profiles.value.find(p => p.id === profileId);
@@ -1190,7 +1286,6 @@
                 return profile.likedBy && profile.likedBy.includes(currentUser.value.email);
             }
 
-            // Check if user has disliked a profile
             function isDislikedByUser(profileId) {
                 if (!currentUser.value) return false;
                 const profile = profiles.value.find(p => p.id === profileId);
@@ -1198,7 +1293,6 @@
                 return profile.dislikedBy && profile.dislikedBy.includes(currentUser.value.email);
             }
 
-            // Check if user has liked (for display messages)
             function hasLikedProfile(profileId) {
                 return isLikedByUser(profileId);
             }
@@ -1207,9 +1301,23 @@
                 return isDislikedByUser(profileId);
             }
 
-            // Like a profile
+            function quickLike(profileId) {
+                if (isUserBanned(profiles.value.find(p => p.id === profileId)?.owner)) {
+                    showToast('This profile belongs to a banned user.', 'error');
+                    return;
+                }
+                likeProfile(profileId);
+            }
+
+            function quickDislike(profileId) {
+                if (isUserBanned(profiles.value.find(p => p.id === profileId)?.owner)) {
+                    showToast('This profile belongs to a banned user.', 'error');
+                    return;
+                }
+                dislikeProfile(profileId);
+            }
+
             function likeProfile(profileId) {
-                // Check if user is logged in
                 if (!currentUser.value) {
                     showToast('Please login to like a profile.', 'error');
                     return;
@@ -1218,36 +1326,37 @@
                 const profile = profiles.value.find(p => p.id === profileId);
                 if (!profile) return;
 
-                // Check if user owns this profile
+                if (isUserBanned(profile.owner)) {
+                    showToast('This profile belongs to a banned user.', 'error');
+                    return;
+                }
+
                 if (profile.owner === currentUser.value.email) {
                     showToast('You cannot like your own portfolio!', 'error');
                     return;
                 }
 
-                // Check if user already liked it
                 if (isLikedByUser(profileId)) {
                     showToast('You already liked this profile!', 'info');
                     return;
                 }
 
-                // If user disliked it, remove the dislike first
                 if (isDislikedByUser(profileId)) {
                     profile.dislikedBy = profile.dislikedBy.filter(email => email !== currentUser.value.email);
                     profile.dislikes = (profile.dislikes || 0) - 1;
                 }
 
-                // Add the like
                 if (!profile.likedBy) profile.likedBy = [];
                 profile.likedBy.push(currentUser.value.email);
                 profile.likes = (profile.likes || 0) + 1;
+
+                checkAndAutoVerify(profile);
 
                 saveData();
                 showToast(`👍 Liked ${profile.name}'s profile!`, 'success');
             }
 
-            // Dislike a profile
             function dislikeProfile(profileId) {
-                // Check if user is logged in
                 if (!currentUser.value) {
                     showToast('Please login to dislike a profile.', 'error');
                     return;
@@ -1256,25 +1365,26 @@
                 const profile = profiles.value.find(p => p.id === profileId);
                 if (!profile) return;
 
-                // Check if user owns this profile
+                if (isUserBanned(profile.owner)) {
+                    showToast('This profile belongs to a banned user.', 'error');
+                    return;
+                }
+
                 if (profile.owner === currentUser.value.email) {
                     showToast('You cannot dislike your own portfolio!', 'error');
                     return;
                 }
 
-                // Check if user already disliked it
                 if (isDislikedByUser(profileId)) {
                     showToast('You already disliked this profile!', 'info');
                     return;
                 }
 
-                // If user liked it, remove the like first
                 if (isLikedByUser(profileId)) {
                     profile.likedBy = profile.likedBy.filter(email => email !== currentUser.value.email);
                     profile.likes = (profile.likes || 0) - 1;
                 }
 
-                // Add the dislike
                 if (!profile.dislikedBy) profile.dislikedBy = [];
                 profile.dislikedBy.push(currentUser.value.email);
                 profile.dislikes = (profile.dislikes || 0) + 1;
@@ -1310,8 +1420,8 @@
                 delete users[email];
                 localStorage.setItem('portfolio_users', JSON.stringify(users));
                 
-                // Delete all profiles owned by this user
                 profiles.value = profiles.value.filter(p => p.owner !== email);
+                refreshBannedCache();
                 
                 showToast(`✅ User "${email}" and their profiles deleted!`, 'success');
                 saveData();
@@ -1357,6 +1467,7 @@
                     profiles.value.forEach(p => {
                         if (p.owner === email) {
                             p.verified = true;
+                            p.manuallyVerified = true;
                         }
                     });
                     
@@ -1383,6 +1494,7 @@
                     profiles.value.forEach(p => {
                         if (p.owner === email) {
                             p.verified = false;
+                            p.manuallyVerified = false;
                         }
                     });
                     
@@ -1423,6 +1535,9 @@
                     users[email].banId = 'BAN-' + Date.now().toString().slice(-6);
                     localStorage.setItem('portfolio_users', JSON.stringify(users));
                     
+                    // Update cache
+                    bannedUsers.value[email] = true;
+                    
                     if (currentUser.value && currentUser.value.email === email) {
                         banData.value = {
                             show: true,
@@ -1452,6 +1567,9 @@
                     users[email].banReason = '';
                     users[email].banId = '';
                     localStorage.setItem('portfolio_users', JSON.stringify(users));
+                    
+                    // Update cache
+                    bannedUsers.value[email] = false;
                     
                     if (currentUser.value && currentUser.value.email === email) {
                         banData.value.show = false;
@@ -1499,6 +1617,7 @@
                     profiles.value.forEach(p => {
                         if (p.owner === currentUser.value.email) {
                             p.verified = true;
+                            p.manuallyVerified = true;
                         }
                     });
                     saveData();
@@ -1609,6 +1728,7 @@
                                 newsItems.value = [];
                             }
                             dataLoaded.value = true;
+                            refreshBannedCache();
                             return;
                         }
                     }
@@ -1617,17 +1737,23 @@
                     messages.value = [];
                     newsItems.value = [];
                     dataLoaded.value = true;
+                    refreshBannedCache();
                     
                 } catch (error) {
                     profiles.value = [...SAMPLE_PROFILES];
                     messages.value = [];
                     newsItems.value = [];
                     dataLoaded.value = true;
+                    refreshBannedCache();
                 }
             }
 
-            // Save Data
+            // Save Data with auto-verify check
             async function saveData() {
+                profiles.value.forEach(p => {
+                    checkAndAutoVerify(p);
+                });
+                
                 try {
                     const data = { 
                         profiles: profiles.value, 
@@ -1642,6 +1768,7 @@
                         },
                         body: JSON.stringify(data)
                     });
+                    refreshBannedCache();
                 } catch (error) {
                     console.error('Save error:', error);
                 }
@@ -1649,6 +1776,10 @@
 
             // Select Profile
             function selectProfile(profile) {
+                if (isUserBanned(profile.owner)) {
+                    selectedProfile.value = profile;
+                    return;
+                }
                 selectedProfile.value = profile;
             }
 
@@ -1678,6 +1809,7 @@
                     likes: 0,
                     dislikes: 0,
                     verified: globalVerified.value,
+                    manuallyVerified: globalVerified.value,
                     likedBy: [],
                     dislikedBy: []
                 };
@@ -1733,6 +1865,7 @@
                     const toggleVerified = confirm('Toggle verified status? Current: ' + (profile.verified ? 'Verified' : 'Not verified'));
                     if (toggleVerified) {
                         profile.verified = !profile.verified;
+                        profile.manuallyVerified = profile.verified;
                     }
                 }
                 
@@ -1839,6 +1972,7 @@
                         banId: ''
                     };
                     localStorage.setItem('portfolio_users', JSON.stringify(users));
+                    refreshBannedCache();
                     showToast('✅ Account created! Please login.', 'success');
                     isSignup.value = false;
                     return;
@@ -1849,7 +1983,6 @@
                     return;
                 }
 
-                // Check if user is banned
                 if (users[loginEmail.value].banned === true) {
                     banData.value = {
                         show: true,
@@ -1913,6 +2046,9 @@
             onMounted(async () => {
                 await loadData();
                 
+                profiles.value.forEach(p => checkAndAutoVerify(p));
+                refreshBannedCache();
+                
                 const sessionRestored = loadSession();
                 if (sessionRestored) {
                     const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
@@ -1934,6 +2070,7 @@
                     if (selectedProfile.value) {
                         loadData();
                     }
+                    refreshBannedCache();
                 }, 30000);
             });
 
@@ -1997,6 +2134,8 @@
                 toggleNewsModal,
                 likeProfile,
                 dislikeProfile,
+                quickLike,
+                quickDislike,
                 isLikedByUser,
                 isDislikedByUser,
                 hasLikedProfile,
@@ -2014,7 +2153,12 @@
                 showBanModal,
                 banTargetEmail,
                 banReason,
-                banData
+                banData,
+                AUTO_VERIFY_THRESHOLD,
+                checkAndAutoVerify,
+                isUserBanned,
+                refreshBannedCache,
+                bannedUsers
             };
         }
     }).mount('#app');
