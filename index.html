@@ -61,7 +61,6 @@
         .chat-message:hover { background: #f8fafc; }
         .owner-badge { background: rgba(99,102,241,0.15); color: #6366f1; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; }
         .verified-profile-badge { background: #1d9bf0; color: white; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; display:inline-flex; align-items:center; gap:4px; }
-        .banned-profile-badge { background: #ef4444; color: white; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; display:inline-flex; align-items:center; gap:4px; }
         .ban-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:99999; display:flex; align-items:center; justify-content:center; animation:shake 0.5s ease-in-out; }
         .ban-card { background:linear-gradient(135deg,#1a1a2e,#16213e); border:2px solid #ef4444; border-radius:30px; padding:50px; max-width:600px; width:90%; text-align:center; box-shadow:0 0 80px rgba(239,68,68,0.3); }
         .ban-card .ban-icon { font-size:80px; color:#ef4444; margin-bottom:20px; animation:pulse 1.5s infinite; }
@@ -69,12 +68,6 @@
         .ban-card p { color:#94a3b8; font-size:16px; line-height:1.6; }
         .ban-card .ban-reason { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:12px; padding:15px; margin:15px 0; color:#fca5a5; font-size:14px; }
         .ban-card .ban-id { color:#64748b; font-size:12px; font-family:monospace; margin-top:10px; }
-        .verify-btn { background:rgba(99,102,241,0.15); color:#818cf8; padding:4px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:0.2s; border:none; }
-        .verify-btn:hover { background:rgba(99,102,241,0.3); }
-        .ban-btn { background:rgba(239,68,68,0.15); color:#f87171; padding:4px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:0.2s; border:none; }
-        .ban-btn:hover { background:rgba(239,68,68,0.3); }
-        .unban-btn { background:rgba(74,222,128,0.15); color:#4ade80; padding:4px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:0.2s; border:none; }
-        .unban-btn:hover { background:rgba(74,222,128,0.3); }
         .dev-action-btn { padding:6px 16px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; border:none; }
         .dev-action-btn.verify { background:#6366f1; color:white; }
         .dev-action-btn.verify:hover { background:#4f46e5; transform:scale(1.05); }
@@ -82,6 +75,8 @@
         .dev-action-btn.ban:hover { background:#dc2626; transform:scale(1.05); }
         .dev-action-btn.unban { background:#22c55e; color:white; }
         .dev-action-btn.unban:hover { background:#16a34a; transform:scale(1.05); }
+        .liked { color: #6366f1 !important; }
+        .disliked { color: #ef4444 !important; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen">
@@ -602,30 +597,48 @@
                                 </div>
                             </div>
 
-                            <!-- Like / Dislike with login requirement -->
+                            <!-- Like / Dislike with proper restrictions -->
                             <div class="border-t pt-4">
                                 <div class="flex items-center gap-6">
                                     <div class="flex items-center gap-2">
                                         <button @click="likeProfile(selectedProfile.id)" 
-                                                :disabled="!currentUser && !isDev"
-                                                class="like-btn text-green-500 hover:text-green-700 text-xl transition"
-                                                :class="{'opacity-50 cursor-not-allowed': !currentUser && !isDev}">
+                                                :disabled="!currentUser || selectedProfile.owner === currentUser.email"
+                                                class="like-btn text-xl transition"
+                                                :class="[
+                                                    isLikedByUser(selectedProfile.id) ? 'liked' : 'text-slate-400 hover:text-indigo-600',
+                                                    (!currentUser || selectedProfile.owner === currentUser.email) ? 'opacity-50 cursor-not-allowed' : ''
+                                                ]">
                                             <i class="fas fa-thumbs-up"></i>
                                         </button>
                                         <span class="font-bold text-slate-700">{{ selectedProfile.likes || 0 }}</span>
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <button @click="dislikeProfile(selectedProfile.id)"
-                                                :disabled="!currentUser && !isDev"
-                                                class="like-btn text-red-400 hover:text-red-600 text-xl transition"
-                                                :class="{'opacity-50 cursor-not-allowed': !currentUser && !isDev}">
+                                                :disabled="!currentUser || selectedProfile.owner === currentUser.email"
+                                                class="like-btn text-xl transition"
+                                                :class="[
+                                                    isDislikedByUser(selectedProfile.id) ? 'disliked' : 'text-slate-400 hover:text-red-600',
+                                                    (!currentUser || selectedProfile.owner === currentUser.email) ? 'opacity-50 cursor-not-allowed' : ''
+                                                ]">
                                             <i class="fas fa-thumbs-down"></i>
                                         </button>
                                         <span class="font-bold text-slate-700">{{ selectedProfile.dislikes || 0 }}</span>
                                     </div>
                                     <div v-if="isDev" class="text-xs text-slate-400 ml-auto">
-                                        <i class="fas fa-user-secret"></i> Dev: edit likes
+                                        <i class="fas fa-user-secret"></i> Dev: can edit
                                     </div>
+                                </div>
+                                <div v-if="!currentUser" class="text-xs text-slate-400 mt-1">
+                                    <i class="fas fa-info-circle mr-1"></i>Login to like/dislike
+                                </div>
+                                <div v-if="currentUser && selectedProfile.owner === currentUser.email" class="text-xs text-slate-400 mt-1">
+                                    <i class="fas fa-info-circle mr-1"></i>You can't like your own portfolio
+                                </div>
+                                <div v-if="currentUser && hasLikedProfile(selectedProfile.id) && !isDev" class="text-xs text-indigo-500 mt-1">
+                                    <i class="fas fa-check-circle mr-1"></i>You already liked this profile
+                                </div>
+                                <div v-if="currentUser && hasDislikedProfile(selectedProfile.id) && !isDev" class="text-xs text-red-500 mt-1">
+                                    <i class="fas fa-check-circle mr-1"></i>You already disliked this profile
                                 </div>
                             </div>
 
@@ -999,7 +1012,9 @@
             createdAt: new Date().toISOString(),
             likes: 12,
             dislikes: 3,
-            verified: true
+            verified: true,
+            likedBy: [],
+            dislikedBy: []
         },
         {
             id: '1002',
@@ -1014,7 +1029,9 @@
             createdAt: new Date().toISOString(),
             likes: 8,
             dislikes: 1,
-            verified: false
+            verified: false,
+            likedBy: [],
+            dislikedBy: []
         },
         {
             id: '1003',
@@ -1029,7 +1046,9 @@
             createdAt: new Date().toISOString(),
             likes: 15,
             dislikes: 2,
-            verified: true
+            verified: true,
+            likedBy: [],
+            dislikedBy: []
         }
     ];
 
@@ -1159,6 +1178,111 @@
                 return profile.owner === currentUser.value.email;
             };
 
+            // ============================================================
+            // LIKE / DISLIKE FUNCTIONS with restrictions
+            // ============================================================
+            
+            // Check if user has liked a profile
+            function isLikedByUser(profileId) {
+                if (!currentUser.value) return false;
+                const profile = profiles.value.find(p => p.id === profileId);
+                if (!profile) return false;
+                return profile.likedBy && profile.likedBy.includes(currentUser.value.email);
+            }
+
+            // Check if user has disliked a profile
+            function isDislikedByUser(profileId) {
+                if (!currentUser.value) return false;
+                const profile = profiles.value.find(p => p.id === profileId);
+                if (!profile) return false;
+                return profile.dislikedBy && profile.dislikedBy.includes(currentUser.value.email);
+            }
+
+            // Check if user has liked (for display messages)
+            function hasLikedProfile(profileId) {
+                return isLikedByUser(profileId);
+            }
+
+            function hasDislikedProfile(profileId) {
+                return isDislikedByUser(profileId);
+            }
+
+            // Like a profile
+            function likeProfile(profileId) {
+                // Check if user is logged in
+                if (!currentUser.value) {
+                    showToast('Please login to like a profile.', 'error');
+                    return;
+                }
+
+                const profile = profiles.value.find(p => p.id === profileId);
+                if (!profile) return;
+
+                // Check if user owns this profile
+                if (profile.owner === currentUser.value.email) {
+                    showToast('You cannot like your own portfolio!', 'error');
+                    return;
+                }
+
+                // Check if user already liked it
+                if (isLikedByUser(profileId)) {
+                    showToast('You already liked this profile!', 'info');
+                    return;
+                }
+
+                // If user disliked it, remove the dislike first
+                if (isDislikedByUser(profileId)) {
+                    profile.dislikedBy = profile.dislikedBy.filter(email => email !== currentUser.value.email);
+                    profile.dislikes = (profile.dislikes || 0) - 1;
+                }
+
+                // Add the like
+                if (!profile.likedBy) profile.likedBy = [];
+                profile.likedBy.push(currentUser.value.email);
+                profile.likes = (profile.likes || 0) + 1;
+
+                saveData();
+                showToast(`👍 Liked ${profile.name}'s profile!`, 'success');
+            }
+
+            // Dislike a profile
+            function dislikeProfile(profileId) {
+                // Check if user is logged in
+                if (!currentUser.value) {
+                    showToast('Please login to dislike a profile.', 'error');
+                    return;
+                }
+
+                const profile = profiles.value.find(p => p.id === profileId);
+                if (!profile) return;
+
+                // Check if user owns this profile
+                if (profile.owner === currentUser.value.email) {
+                    showToast('You cannot dislike your own portfolio!', 'error');
+                    return;
+                }
+
+                // Check if user already disliked it
+                if (isDislikedByUser(profileId)) {
+                    showToast('You already disliked this profile!', 'info');
+                    return;
+                }
+
+                // If user liked it, remove the like first
+                if (isLikedByUser(profileId)) {
+                    profile.likedBy = profile.likedBy.filter(email => email !== currentUser.value.email);
+                    profile.likes = (profile.likes || 0) - 1;
+                }
+
+                // Add the dislike
+                if (!profile.dislikedBy) profile.dislikedBy = [];
+                profile.dislikedBy.push(currentUser.value.email);
+                profile.dislikes = (profile.dislikes || 0) + 1;
+
+                saveData();
+                showToast(`👎 Disliked ${profile.name}'s profile`, 'info');
+            }
+
             // Get All Users from localStorage
             function getAllUsers() {
                 try {
@@ -1218,7 +1342,7 @@
             }
 
             // ============================================================
-            // VERIFICATION FUNCTIONS (Developer can verify anyone)
+            // VERIFICATION FUNCTIONS
             // ============================================================
             function verifyUser(email) {
                 if (!isDev.value) {
@@ -1344,7 +1468,7 @@
             }
 
             // ============================================================
-            // SECRET CODE VERIFICATION (User self-verification)
+            // SECRET CODE VERIFICATION
             // ============================================================
             function verifyCode() {
                 const entered = secretCodeInput.value.trim();
@@ -1553,7 +1677,9 @@
                     createdAt: new Date().toISOString(),
                     likes: 0,
                     dislikes: 0,
-                    verified: globalVerified.value
+                    verified: globalVerified.value,
+                    likedBy: [],
+                    dislikedBy: []
                 };
 
                 profiles.value.unshift(newProfile);
@@ -1647,31 +1773,6 @@
                 messages.value = messages.value.filter(m => m !== msg);
                 await saveData();
                 showToast('🗑️ Message deleted', 'info');
-            }
-
-            // Like/Dislike
-            function likeProfile(id) {
-                if (!currentUser.value && !isDev.value) {
-                    showToast('Please login to like a profile.', 'error');
-                    return;
-                }
-                const p = profiles.value.find(pr => pr.id === id);
-                if (!p) return;
-                p.likes = (p.likes || 0) + 1;
-                saveData();
-                showToast(`👍 Liked ${p.name}'s profile!`, 'success');
-            }
-
-            function dislikeProfile(id) {
-                if (!currentUser.value && !isDev.value) {
-                    showToast('Please login to dislike a profile.', 'error');
-                    return;
-                }
-                const p = profiles.value.find(pr => pr.id === id);
-                if (!p) return;
-                p.dislikes = (p.dislikes || 0) + 1;
-                saveData();
-                showToast(`👎 Disliked ${p.name}'s profile`, 'info');
             }
 
             // Share
@@ -1896,6 +1997,10 @@
                 toggleNewsModal,
                 likeProfile,
                 dislikeProfile,
+                isLikedByUser,
+                isDislikedByUser,
+                hasLikedProfile,
+                hasDislikedProfile,
                 shareProfile,
                 canDeleteMessage,
                 deleteMessage,
@@ -1914,7 +2019,5 @@
         }
     }).mount('#app');
 </script>
-</body>
-</html>
 </body>
 </html>
