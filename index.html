@@ -13,6 +13,7 @@
         @keyframes popIn { 0%{transform:scale(0) rotate(-10deg); opacity:0} 70%{transform:scale(1.2) rotate(2deg)} 100%{transform:scale(1) rotate(0); opacity:1} }
         @keyframes bellRing { 0%,100%{transform:rotate(0)} 25%{transform:rotate(10deg)} 75%{transform:rotate(-10deg)} }
         @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 10%,30%,50%,70%,90%{transform:translateX(-10px)} 20%,40%,60%,80%{transform:translateX(10px)} }
         .animate-float { animation: float 3s ease-in-out infinite; }
         .animate-slide-in { animation: slideIn 0.5s ease-out forwards; }
         .glass-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); }
@@ -59,13 +60,52 @@
         .chat-message { transition: all 0.2s; }
         .chat-message:hover { background: #f8fafc; }
         .owner-badge { background: rgba(99,102,241,0.15); color: #6366f1; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; }
-        .profile-count-badge { background: rgba(99,102,241,0.1); color: #6366f1; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
         .verified-profile-badge { background: #1d9bf0; color: white; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; display:inline-flex; align-items:center; gap:4px; }
+        .banned-profile-badge { background: #ef4444; color: white; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; display:inline-flex; align-items:center; gap:4px; }
+        .ban-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:99999; display:flex; align-items:center; justify-content:center; animation:shake 0.5s ease-in-out; }
+        .ban-card { background:linear-gradient(135deg,#1a1a2e,#16213e); border:2px solid #ef4444; border-radius:30px; padding:50px; max-width:600px; width:90%; text-align:center; box-shadow:0 0 80px rgba(239,68,68,0.3); }
+        .ban-card .ban-icon { font-size:80px; color:#ef4444; margin-bottom:20px; animation:pulse 1.5s infinite; }
+        .ban-card h1 { color:#ef4444; font-size:32px; font-weight:800; margin-bottom:10px; }
+        .ban-card p { color:#94a3b8; font-size:16px; line-height:1.6; }
+        .ban-card .ban-reason { background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:12px; padding:15px; margin:15px 0; color:#fca5a5; font-size:14px; }
+        .ban-card .ban-id { color:#64748b; font-size:12px; font-family:monospace; margin-top:10px; }
+        .verify-btn { background:rgba(99,102,241,0.15); color:#818cf8; padding:4px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:0.2s; border:none; }
+        .verify-btn:hover { background:rgba(99,102,241,0.3); }
+        .ban-btn { background:rgba(239,68,68,0.15); color:#f87171; padding:4px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:0.2s; border:none; }
+        .ban-btn:hover { background:rgba(239,68,68,0.3); }
+        .unban-btn { background:rgba(74,222,128,0.15); color:#4ade80; padding:4px 12px; border-radius:6px; font-size:12px; cursor:pointer; transition:0.2s; border:none; }
+        .unban-btn:hover { background:rgba(74,222,128,0.3); }
+        .dev-action-btn { padding:6px 16px; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.2s; border:none; }
+        .dev-action-btn.verify { background:#6366f1; color:white; }
+        .dev-action-btn.verify:hover { background:#4f46e5; transform:scale(1.05); }
+        .dev-action-btn.ban { background:#ef4444; color:white; }
+        .dev-action-btn.ban:hover { background:#dc2626; transform:scale(1.05); }
+        .dev-action-btn.unban { background:#22c55e; color:white; }
+        .dev-action-btn.unban:hover { background:#16a34a; transform:scale(1.05); }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen">
 
 <div id="app">
+    <!-- BAN OVERLAY -->
+    <div v-if="banData.show" class="ban-overlay">
+        <div class="ban-card">
+            <div class="ban-icon">🚫</div>
+            <h1>Account Banned</h1>
+            <p>This account has been suspended by the administrator.</p>
+            <div class="ban-reason">
+                <strong>Reason:</strong> {{ banData.reason }}
+            </div>
+            <p style="font-size:14px;color:#64748b;margin-top:10px;">
+                If you believe this is a mistake, please contact support.
+            </p>
+            <div class="ban-id">Ban ID: #{{ banData.banId }}</div>
+            <button @click="logoutFromBan" class="mt-4 px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition-colors">
+                <i class="fas fa-sign-out-alt mr-2"></i>Logout
+            </button>
+        </div>
+    </div>
+
     <!-- Toast Notification -->
     <div v-if="toast.show" class="toast bg-white rounded-2xl shadow-2xl p-4 border border-slate-200 max-w-sm">
         <div class="flex items-start gap-3">
@@ -119,7 +159,7 @@
                     <span class="text-xs text-slate-400">profiles</span>
                 </div>
                 
-                <div v-if="currentUser" class="flex items-center gap-3 bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm border border-white/30">
+                <div v-if="currentUser && !banData.show" class="flex items-center gap-3 bg-white/50 px-4 py-2 rounded-full backdrop-blur-sm border border-white/30">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold">
                         {{ currentUser.name.charAt(0).toUpperCase() }}
                     </div>
@@ -130,12 +170,12 @@
                     </button>
                 </div>
                 
-                <button v-else @click="showLogin = true" 
+                <button v-else-if="!banData.show" @click="showLogin = true" 
                         class="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full font-medium hover:shadow-lg transition-all hover:scale-105 text-sm">
                     <i class="fas fa-sign-in-alt mr-2"></i>Login
                 </button>
                 
-                <div class="relative" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false">
+                <div class="relative" @mouseenter="showDropdown = true" @mouseleave="showDropdown = false" v-if="!banData.show">
                     <button class="w-10 h-10 rounded-full hover:bg-white/50 transition-all flex items-center justify-center text-slate-500 hover:text-slate-700">
                         <i class="fas fa-ellipsis-v text-lg"></i>
                     </button>
@@ -231,14 +271,14 @@
     </div>
 
     <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-6 pb-12">
+    <div class="max-w-7xl mx-auto px-6 pb-12" v-if="!banData.show">
         
         <!-- Developer Dashboard -->
         <div v-if="showDevDashboard && isDev" class="dev-dashboard mb-8 animate-slide-in">
             <div class="header flex justify-between items-center">
                 <div>
                     <h2 class="text-xl font-bold text-white">📊 Developer Dashboard</h2>
-                    <p class="text-sm text-slate-400">View all user accounts and their passwords</p>
+                    <p class="text-sm text-slate-400">Manage users, verify accounts, and ban offenders</p>
                 </div>
                 <div class="flex gap-2">
                     <button @click="exportUserData" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm transition-colors">
@@ -258,6 +298,7 @@
                             <th>Name</th>
                             <th>Password</th>
                             <th>Verified</th>
+                            <th>Banned</th>
                             <th>Profiles</th>
                             <th>Actions</th>
                         </tr>
@@ -280,19 +321,37 @@
                                 <span v-else class="text-slate-500">❌</span>
                             </td>
                             <td>
+                                <span v-if="user.banned" class="text-red-400">🚫</span>
+                                <span v-else class="text-slate-500">❌</span>
+                            </td>
+                            <td>
                                 <span class="text-sm text-white">{{ getUserProfileCount(email) }}</span>
                                 <button @click="viewUserProfiles(email)" class="ml-2 text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded transition-colors">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </td>
                             <td>
-                                <button @click="deleteUserAccount(email)" class="delete-user-btn">
-                                    <i class="fas fa-trash mr-1"></i>Delete
-                                </button>
+                                <div class="flex gap-1 flex-wrap">
+                                    <button v-if="!user.verified" @click="verifyUser(email)" class="dev-action-btn verify">
+                                        <i class="fas fa-check mr-1"></i>Verify
+                                    </button>
+                                    <button v-if="user.verified" @click="unverifyUser(email)" class="dev-action-btn" style="background:#8b5cf6;color:white;">
+                                        <i class="fas fa-times mr-1"></i>Unverify
+                                    </button>
+                                    <button v-if="!user.banned" @click="banUser(email)" class="dev-action-btn ban">
+                                        <i class="fas fa-ban mr-1"></i>Ban
+                                    </button>
+                                    <button v-if="user.banned" @click="unbanUser(email)" class="dev-action-btn unban">
+                                        <i class="fas fa-check-circle mr-1"></i>Unban
+                                    </button>
+                                    <button @click="deleteUserAccount(email)" class="delete-user-btn">
+                                        <i class="fas fa-trash mr-1"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         <tr v-if="Object.keys(getAllUsers()).length === 0">
-                            <td colspan="7" class="text-center text-slate-500 py-8">
+                            <td colspan="8" class="text-center text-slate-500 py-8">
                                 <i class="fas fa-user-slash text-2xl block mb-2"></i>
                                 No users registered yet
                             </td>
@@ -862,6 +921,37 @@
         </div>
     </div>
 
+    <!-- BAN REASON MODAL -->
+    <div v-if="showBanModal" class="fixed inset-0 modal-overlay flex items-center justify-center z-50 p-4" @click.self="showBanModal = false">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 transform transition-all animate-slide-in">
+            <div class="text-center mb-6">
+                <div class="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center text-4xl mx-auto">
+                    <i class="fas fa-ban text-red-600"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800 mt-4">Ban User</h2>
+                <p class="text-sm text-slate-400">Enter a reason for banning this user</p>
+                <p class="text-xs text-slate-500 mt-2 font-mono">{{ banTargetEmail }}</p>
+            </div>
+            
+            <div class="space-y-4">
+                <textarea 
+                    v-model="banReason"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-red-500 outline-none text-sm resize-none"
+                    placeholder="Enter ban reason..."
+                    rows="4"
+                ></textarea>
+                <div class="flex gap-2">
+                    <button @click="confirmBan" class="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all">
+                        <i class="fas fa-ban mr-2"></i>Ban User
+                    </button>
+                    <button @click="showBanModal = false" class="flex-1 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-semibold transition-all">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="mt-12 border-t border-slate-200/50 py-8">
         <div class="max-w-7xl mx-auto px-6 flex flex-wrap justify-between items-center gap-4">
@@ -883,7 +973,7 @@
 </div>
 
 <script>
-    const { createApp, ref, computed, onMounted } = Vue;
+    const { createApp, ref, computed, onMounted, nextTick } = Vue;
 
     // ============================================================
     // YOUR JSONBIN CREDENTIALS
@@ -961,6 +1051,7 @@
             const profiles = ref([]);
             const messages = ref([]);
             const newsItems = ref([]);
+            const dataLoaded = ref(false);
             
             // Auth
             const currentUser = ref(null);
@@ -978,7 +1069,17 @@
             const showUserProfilesModal = ref(false);
             const viewingUserEmail = ref('');
 
-            // Secret Code - now per-user verified flag
+            // Ban System
+            const banData = ref({
+                show: false,
+                reason: '',
+                banId: ''
+            });
+            const showBanModal = ref(false);
+            const banTargetEmail = ref('');
+            const banReason = ref('');
+
+            // Secret Code
             const secretCodeInput = ref('');
             const globalVerified = ref(false);
             const codeMessageText = ref('🔑 Enter the secret code to get verified');
@@ -1036,6 +1137,7 @@
 
             // Get user profile count
             function getUserProfileCount(email) {
+                if (!email) return 0;
                 return profiles.value.filter(p => p.owner === email).length;
             }
 
@@ -1121,7 +1223,153 @@
                 showToast('✅ Data exported successfully!', 'success');
             }
 
-            // Secret Code Verification - sets verified flag on the user account
+            // ============================================================
+            // VERIFICATION FUNCTIONS (Developer can verify anyone)
+            // ============================================================
+            function verifyUser(email) {
+                if (!isDev.value) {
+                    showToast('❌ Only developers can verify users', 'error');
+                    return;
+                }
+                const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                if (users[email]) {
+                    users[email].verified = true;
+                    localStorage.setItem('portfolio_users', JSON.stringify(users));
+                    
+                    // Also update all profiles owned by this user
+                    profiles.value.forEach(p => {
+                        if (p.owner === email) {
+                            p.verified = true;
+                        }
+                    });
+                    
+                    // If this is the current user, update their verified status
+                    if (currentUser.value && currentUser.value.email === email) {
+                        globalVerified.value = true;
+                        localStorage.setItem('verified_' + email, 'true');
+                    }
+                    
+                    saveData();
+                    showToast(`✅ User "${email}" has been verified!`, 'success');
+                }
+            }
+
+            function unverifyUser(email) {
+                if (!isDev.value) {
+                    showToast('❌ Only developers can unverify users', 'error');
+                    return;
+                }
+                const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                if (users[email]) {
+                    users[email].verified = false;
+                    localStorage.setItem('portfolio_users', JSON.stringify(users));
+                    
+                    profiles.value.forEach(p => {
+                        if (p.owner === email) {
+                            p.verified = false;
+                        }
+                    });
+                    
+                    if (currentUser.value && currentUser.value.email === email) {
+                        globalVerified.value = false;
+                        localStorage.removeItem('verified_' + email);
+                    }
+                    
+                    saveData();
+                    showToast(`❌ User "${email}" has been unverified`, 'info');
+                }
+            }
+
+            // ============================================================
+            // BAN FUNCTIONS
+            // ============================================================
+            function banUser(email) {
+                if (!isDev.value) {
+                    showToast('❌ Only developers can ban users', 'error');
+                    return;
+                }
+                banTargetEmail.value = email;
+                banReason.value = '';
+                showBanModal.value = true;
+            }
+
+            function confirmBan() {
+                if (!banReason.value.trim()) {
+                    showToast('⚠️ Please enter a reason for the ban', 'error');
+                    return;
+                }
+                
+                const email = banTargetEmail.value;
+                const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                if (users[email]) {
+                    users[email].banned = true;
+                    users[email].banReason = banReason.value.trim();
+                    users[email].banId = 'BAN-' + Date.now().toString().slice(-6);
+                    localStorage.setItem('portfolio_users', JSON.stringify(users));
+                    
+                    // If the banned user is currently logged in, show the ban overlay
+                    if (currentUser.value && currentUser.value.email === email) {
+                        banData.value = {
+                            show: true,
+                            reason: banReason.value.trim(),
+                            banId: users[email].banId
+                        };
+                    }
+                    
+                    showBanModal.value = false;
+                    banTargetEmail.value = '';
+                    banReason.value = '';
+                    saveData();
+                    showToast(`🚫 User "${email}" has been banned!`, 'error');
+                }
+            }
+
+            function unbanUser(email) {
+                if (!isDev.value) {
+                    showToast('❌ Only developers can unban users', 'error');
+                    return;
+                }
+                if (!confirm(`Unban user "${email}"?`)) return;
+                
+                const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                if (users[email]) {
+                    users[email].banned = false;
+                    users[email].banReason = '';
+                    users[email].banId = '';
+                    localStorage.setItem('portfolio_users', JSON.stringify(users));
+                    
+                    // If this is the current user, hide the ban overlay
+                    if (currentUser.value && currentUser.value.email === email) {
+                        banData.value.show = false;
+                    }
+                    
+                    saveData();
+                    showToast(`✅ User "${email}" has been unbanned!`, 'success');
+                }
+            }
+
+            function logoutFromBan() {
+                banData.value.show = false;
+                logout();
+            }
+
+            // Check if user is banned on login
+            function checkIfBanned(email) {
+                const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                if (users[email] && users[email].banned) {
+                    banData.value = {
+                        show: true,
+                        reason: users[email].banReason || 'No reason provided',
+                        banId: users[email].banId || 'BAN-' + Date.now().toString().slice(-6)
+                    };
+                    return true;
+                }
+                return false;
+            }
+
+            // ============================================================
+            // SECRET CODE VERIFICATION (User self-verification)
+            // ============================================================
             function verifyCode() {
                 const entered = secretCodeInput.value.trim();
 
@@ -1137,7 +1385,6 @@
                         return;
                     }
                     
-                    // Mark this user as verified in localStorage
                     const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
                     if (users[currentUser.value.email]) {
                         users[currentUser.value.email].verified = true;
@@ -1148,6 +1395,14 @@
                     codeMessageClass.value = 'success';
                     codeMessageText.value = '✅ Verified! Your account is now verified. New portfolios will have the badge. 🎉';
                     localStorage.setItem('verified_' + currentUser.value.email, 'true');
+                    
+                    // Also update all profiles owned by this user
+                    profiles.value.forEach(p => {
+                        if (p.owner === currentUser.value.email) {
+                            p.verified = true;
+                        }
+                    });
+                    saveData();
                     showToast('✅ Account verified! Your next portfolio will have the badge.', 'success');
                 } else {
                     globalVerified.value = false;
@@ -1167,7 +1422,6 @@
                         codeMessageClass.value = 'success';
                         codeMessageText.value = '✅ Verified! Your account is verified. 🎉';
                     } else {
-                        // Check if user was already verified in the users object
                         const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
                         if (users[currentUser.value.email] && users[currentUser.value.email].verified) {
                             globalVerified.value = true;
@@ -1255,6 +1509,7 @@
                             } else {
                                 newsItems.value = [];
                             }
+                            dataLoaded.value = true;
                             return;
                         }
                     }
@@ -1262,11 +1517,13 @@
                     profiles.value = [...SAMPLE_PROFILES];
                     messages.value = [];
                     newsItems.value = [];
+                    dataLoaded.value = true;
                     
                 } catch (error) {
                     profiles.value = [...SAMPLE_PROFILES];
                     messages.value = [];
                     newsItems.value = [];
+                    dataLoaded.value = true;
                 }
             }
 
@@ -1296,7 +1553,7 @@
                 selectedProfile.value = profile;
             }
 
-            // Add Profile - now with verified flag if user is verified
+            // Add Profile
             async function addProfile() {
                 if (!currentUser.value) {
                     showToast('Please login first', 'error');
@@ -1321,7 +1578,7 @@
                     createdAt: new Date().toISOString(),
                     likes: 0,
                     dislikes: 0,
-                    verified: globalVerified.value // Only verified if user has unlocked it
+                    verified: globalVerified.value
                 };
 
                 profiles.value.unshift(newProfile);
@@ -1371,7 +1628,6 @@
                 const newAvatar = prompt('Choose avatar (emoji):', profile.avatar);
                 if (newAvatar && newAvatar.length <= 2) profile.avatar = newAvatar;
                 
-                // Allow toggling verified status (dev only or owner can't change)
                 if (isDev.value) {
                     const toggleVerified = confirm('Toggle verified status? Current: ' + (profile.verified ? 'Verified' : 'Not verified'));
                     if (toggleVerified) {
@@ -1501,7 +1757,10 @@
                     users[loginEmail.value] = { 
                         password: loginPassword.value, 
                         name: loginEmail.value.split('@')[0],
-                        verified: false
+                        verified: false,
+                        banned: false,
+                        banReason: '',
+                        banId: ''
                     };
                     localStorage.setItem('portfolio_users', JSON.stringify(users));
                     showToast('✅ Account created! Please login.', 'success');
@@ -1511,6 +1770,17 @@
 
                 if (!users[loginEmail.value] || users[loginEmail.value].password !== loginPassword.value) {
                     showToast('❌ Invalid credentials', 'error');
+                    return;
+                }
+
+                // Check if user is banned
+                if (users[loginEmail.value].banned) {
+                    banData.value = {
+                        show: true,
+                        reason: users[loginEmail.value].banReason || 'No reason provided',
+                        banId: users[loginEmail.value].banId || 'BAN-' + Date.now().toString().slice(-6)
+                    };
+                    showToast('🚫 This account has been banned!', 'error');
                     return;
                 }
 
@@ -1539,6 +1809,7 @@
                 isDev.value = false;
                 showDevDashboard.value = false;
                 globalVerified.value = false;
+                banData.value.show = false;
                 localStorage.removeItem('portfolio_session');
                 showToast('👋 Logged out successfully', 'info');
             }
@@ -1566,12 +1837,25 @@
 
             onMounted(async () => {
                 await loadData();
+                
                 const sessionRestored = loadSession();
                 if (sessionRestored) {
-                    loadSavedVerification();
-                    showToast(`👋 Welcome back ${currentUser.value.name}!`, 'success');
+                    // Check if the restored user is banned
+                    const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                    if (users[currentUser.value.email] && users[currentUser.value.email].banned) {
+                        banData.value = {
+                            show: true,
+                            reason: users[currentUser.value.email].banReason || 'No reason provided',
+                            banId: users[currentUser.value.email].banId || 'BAN-' + Date.now().toString().slice(-6)
+                        };
+                        showToast('🚫 This account has been banned!', 'error');
+                    } else {
+                        loadSavedVerification();
+                        await nextTick();
+                        showToast(`👋 Welcome back ${currentUser.value.name}!`, 'success');
+                    }
                 }
-                loadSavedVerification();
+                
                 refreshInterval = setInterval(() => {
                     if (selectedProfile.value) {
                         loadData();
@@ -1615,6 +1899,7 @@
                 sendMessage,
                 loginUser,
                 logout,
+                logoutFromBan,
                 activateDevMode,
                 secretCodeInput,
                 globalVerified,
@@ -1641,7 +1926,19 @@
                 shareProfile,
                 canDeleteMessage,
                 deleteMessage,
-                saveData
+                saveData,
+                dataLoaded,
+                // Ban & Verify functions
+                verifyUser,
+                unverifyUser,
+                banUser,
+                confirmBan,
+                unbanUser,
+                showBanModal,
+                banTargetEmail,
+                banReason,
+                banData,
+                checkIfBanned
             };
         }
     }).mount('#app');
