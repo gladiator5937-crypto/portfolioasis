@@ -457,11 +457,14 @@
                     </div>
                 </div>
 
-                <!-- Profile Cards with Banned Indicator -->
+                <!-- Profile Cards -->
                 <div v-if="filteredProfiles.length === 0" class="text-center py-20">
                     <div class="text-6xl mb-4">🔍</div>
                     <h3 class="text-2xl font-bold text-slate-700">No profiles found</h3>
                     <p class="text-slate-400 mt-2">Try adjusting your search</p>
+                    <p v-if="!currentUser" class="text-slate-400 text-sm mt-4">
+                        <i class="fas fa-info-circle mr-1"></i> Login and create your first portfolio!
+                    </p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -503,7 +506,7 @@
                                     {{ isUserBanned(profile.owner) ? '⚠️ This portfolio belongs to a banned user.' : profile.bio }}
                                 </p>
                                 
-                                <!-- Like/Dislike Buttons on Card (disabled for banned users) -->
+                                <!-- Like/Dislike Buttons on Card -->
                                 <div class="flex items-center gap-3 mt-3">
                                     <button @click.stop="!isUserBanned(profile.owner) && quickLike(profile.id)" 
                                             :disabled="!currentUser || profile.owner === currentUser.email || isUserBanned(profile.owner)"
@@ -559,7 +562,7 @@
                     </div>
                 </div>
 
-                <!-- Selected Profile Card (only if not banned) -->
+                <!-- Selected Profile Card -->
                 <div v-if="selectedProfile && !isUserBanned(selectedProfile.owner)" class="sticky top-28">
                     <div class="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden">
                         <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white">
@@ -1056,9 +1059,6 @@
     // 🚫 PROFANITY LIST
     const PROFANITY_LIST = ['fuck', 'shit', 'asshole', 'bitch', 'cunt', 'dick', 'pussy', 'bastard', 'whore', 'slut', 'damn', 'hell', 'crap', 'stupid', 'idiot', 'moron'];
 
-   
-    ];
-
     createApp({
         setup() {
             const searchQuery = ref('');
@@ -1163,11 +1163,9 @@
             // ============================================================
             function isUserBanned(email) {
                 if (!email) return false;
-                // Check cache first
                 if (bannedUsers.value[email] !== undefined) {
                     return bannedUsers.value[email];
                 }
-                // Check localStorage
                 const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
                 const isBanned = users[email] && users[email].banned === true;
                 bannedUsers.value[email] = isBanned;
@@ -1187,7 +1185,7 @@
                 return profiles.value.filter(p => p.owner === email).length;
             }
 
-            // Get user profiles (excluding banned ones for non-dev users)
+            // Get user profiles
             function getUserProfiles(email) {
                 return profiles.value.filter(p => p.owner === email);
             }
@@ -1224,7 +1222,7 @@
             }
 
             // ============================================================
-            // LIKE / DISLIKE FUNCTIONS with restrictions
+            // LIKE / DISLIKE FUNCTIONS
             // ============================================================
             
             function isLikedByUser(profileId) {
@@ -1483,7 +1481,6 @@
                     users[email].banId = 'BAN-' + Date.now().toString().slice(-6);
                     localStorage.setItem('portfolio_users', JSON.stringify(users));
                     
-                    // Update cache
                     bannedUsers.value[email] = true;
                     
                     if (currentUser.value && currentUser.value.email === email) {
@@ -1516,7 +1513,6 @@
                     users[email].banId = '';
                     localStorage.setItem('portfolio_users', JSON.stringify(users));
                     
-                    // Update cache
                     bannedUsers.value[email] = false;
                     
                     if (currentUser.value && currentUser.value.email === email) {
@@ -1667,7 +1663,7 @@
                             if (data.record.profiles && data.record.profiles.length > 0) {
                                 profiles.value = data.record.profiles;
                             } else {
-                                profiles.value = [...SAMPLE_PROFILES];
+                                profiles.value = [];
                             }
                             messages.value = data.record.messages || [];
                             if (data.record.news) {
@@ -1681,14 +1677,14 @@
                         }
                     }
                     
-                    profiles.value = [...SAMPLE_PROFILES];
+                    profiles.value = [];
                     messages.value = [];
                     newsItems.value = [];
                     dataLoaded.value = true;
                     refreshBannedCache();
                     
                 } catch (error) {
-                    profiles.value = [...SAMPLE_PROFILES];
+                    profiles.value = [];
                     messages.value = [];
                     newsItems.value = [];
                     dataLoaded.value = true;
