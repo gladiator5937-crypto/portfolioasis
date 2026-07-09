@@ -13,7 +13,6 @@
         @keyframes popIn { 0%{transform:scale(0) rotate(-10deg); opacity:0} 70%{transform:scale(1.2) rotate(2deg)} 100%{transform:scale(1) rotate(0); opacity:1} }
         @keyframes bellRing { 0%,100%{transform:rotate(0)} 25%{transform:rotate(10deg)} 75%{transform:rotate(-10deg)} }
         @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
-        @keyframes shimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
         .animate-float { animation: float 3s ease-in-out infinite; }
         .animate-slide-in { animation: slideIn 0.5s ease-out forwards; }
         .glass-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.3); }
@@ -53,7 +52,6 @@
         .like-btn:active:not(:disabled) { transform: scale(0.9); }
         .profile-avatar { transition: all 0.3s; }
         .profile-avatar:hover { transform: scale(1.05) rotate(-5deg); }
-        .badge-pulse { animation: pulse 2s infinite; }
         .gradient-border { background: linear-gradient(135deg, #6366f1, #8b5cf6, #d946ef); padding: 2px; border-radius: 16px; }
         .gradient-border > div { background: white; border-radius: 14px; }
         .toast { position: fixed; bottom: 20px; right: 20px; z-index: 9999; animation: slideIn 0.5s ease-out; }
@@ -61,8 +59,8 @@
         .chat-message { transition: all 0.2s; }
         .chat-message:hover { background: #f8fafc; }
         .owner-badge { background: rgba(99,102,241,0.15); color: #6366f1; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; }
-        .multiple-profiles-badge { background: #f59e0b; color: white; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; }
         .profile-count-badge { background: rgba(99,102,241,0.1); color: #6366f1; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+        .verified-profile-badge { background: #1d9bf0; color: white; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; display:inline-flex; align-items:center; gap:4px; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen">
@@ -111,7 +109,7 @@
                     </span>
                 </div>
 
-                <div v-if="isVerified" class="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full border border-green-200">
+                <div v-if="globalVerified" class="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full border border-green-200">
                     <span class="verified-badge">✅ Verified</span>
                 </div>
 
@@ -149,6 +147,7 @@
                             <p class="text-sm font-semibold text-slate-800" v-if="currentUser">{{ currentUser.name }}</p>
                             <p class="text-sm text-slate-400" v-else>Not logged in</p>
                             <p v-if="currentUser" class="text-xs text-slate-400">📁 {{ getUserProfileCount(currentUser.email) }} portfolios</p>
+                            <p v-if="globalVerified" class="text-xs text-green-600">✅ Verified account</p>
                         </div>
                         <button @click="showDev = true" class="w-full text-left px-4 py-3 hover:bg-indigo-50 transition-colors flex items-center gap-3">
                             <i class="fas fa-cog text-slate-600"></i>
@@ -258,6 +257,7 @@
                             <th>Email</th>
                             <th>Name</th>
                             <th>Password</th>
+                            <th>Verified</th>
                             <th>Profiles</th>
                             <th>Actions</th>
                         </tr>
@@ -276,6 +276,10 @@
                                 </button>
                             </td>
                             <td>
+                                <span v-if="user.verified" class="text-green-400">✅</span>
+                                <span v-else class="text-slate-500">❌</span>
+                            </td>
+                            <td>
                                 <span class="text-sm text-white">{{ getUserProfileCount(email) }}</span>
                                 <button @click="viewUserProfiles(email)" class="ml-2 text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-1 rounded transition-colors">
                                     <i class="fas fa-eye"></i>
@@ -288,7 +292,7 @@
                             </td>
                         </tr>
                         <tr v-if="Object.keys(getAllUsers()).length === 0">
-                            <td colspan="6" class="text-center text-slate-500 py-8">
+                            <td colspan="7" class="text-center text-slate-500 py-8">
                                 <i class="fas fa-user-slash text-2xl block mb-2"></i>
                                 No users registered yet
                             </td>
@@ -318,6 +322,7 @@
                                 <div class="flex items-center gap-2">
                                     <span class="font-bold text-slate-800">{{ profile.name }}</span>
                                     <span class="text-xs text-indigo-600">{{ profile.title }}</span>
+                                    <span v-if="profile.verified" class="verified-profile-badge"><i class="fas fa-check-circle"></i> Verified</span>
                                 </div>
                                 <p class="text-sm text-slate-500 mt-1">{{ profile.bio }}</p>
                                 <div class="flex gap-2 mt-2">
@@ -378,9 +383,9 @@
                             {{ profiles.length }} total
                         </span>
                     </div>
-                    <div v-if="isVerified" class="bg-green-50 px-4 py-2 rounded-full border border-green-200">
+                    <div v-if="globalVerified" class="bg-green-50 px-4 py-2 rounded-full border border-green-200">
                         <span class="text-sm font-medium text-green-700">
-                            <i class="fas fa-check-circle mr-2"></i>Verified User
+                            <i class="fas fa-check-circle mr-2"></i>Verified Account
                         </span>
                     </div>
                     <div v-if="isDev" class="bg-amber-50 px-4 py-2 rounded-full border border-amber-200">
@@ -420,8 +425,8 @@
                                         <p class="text-xs font-semibold text-indigo-600">{{ profile.title }}</p>
                                     </div>
                                     <div class="flex flex-col items-end gap-1">
-                                        <span v-if="profile.owner" class="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">
-                                            <i class="fas fa-check-circle text-[10px]"></i> Verified
+                                        <span v-if="profile.verified" class="verified-profile-badge text-xs">
+                                            <i class="fas fa-check-circle"></i> Verified
                                         </span>
                                         <span v-if="isDev || (currentUser && profile.owner === currentUser.email)" class="text-xs owner-badge">
                                             <i class="fas fa-user-edit mr-1"></i>Yours
@@ -465,7 +470,7 @@
                 <!-- Secret Code Section -->
                 <div class="secret-section">
                     <div class="text-sm font-semibold text-white mb-1">🔑 Unlock Verified Badge</div>
-                    <p class="text-xs text-slate-400 mb-3">Enter the secret code to get a verified badge on your profile</p>
+                    <p class="text-xs text-slate-400 mb-3">Enter the secret code to get a verified badge on your portfolio</p>
                     <div class="code-input-row">
                         <input 
                             type="text" 
@@ -482,6 +487,9 @@
                     <div class="mt-3 text-xs text-slate-500">
                         💡 Hint: Check the footer for the code
                     </div>
+                    <div v-if="globalVerified && currentUser" class="mt-3 text-xs text-green-400">
+                        ✅ Your account is verified! New portfolios will have the badge.
+                    </div>
                 </div>
 
                 <!-- Selected Profile Card -->
@@ -496,7 +504,7 @@
                                     <div>
                                         <h2 class="text-xl font-bold">{{ selectedProfile.name }}</h2>
                                         <p class="text-sm text-white/80">{{ selectedProfile.title }}</p>
-                                        <span v-if="isVerified && selectedProfile.owner === currentUser?.email" class="verified-badge mt-1 inline-block">
+                                        <span v-if="selectedProfile.verified" class="verified-badge mt-1 inline-block">
                                             ✅ Verified
                                         </span>
                                         <span v-if="currentUser && selectedProfile.owner === currentUser.email" class="inline-block mt-1 text-xs bg-white/20 px-2 py-0.5 rounded-full">
@@ -675,6 +683,9 @@
                             <p class="text-sm text-slate-400">Join the community of creators</p>
                             <p v-if="currentUser" class="text-xs text-slate-500 mt-1">
                                 <i class="fas fa-folder mr-1"></i> You have {{ getUserProfileCount(currentUser.email) }} portfolio(s)
+                            </p>
+                            <p v-if="globalVerified && currentUser" class="text-xs text-green-600 mt-1">
+                                <i class="fas fa-check-circle mr-1"></i> Your account is verified! Your new portfolio will have the badge.
                             </p>
                         </div>
 
@@ -903,7 +914,8 @@
             owner: 'sarah@example.com',
             createdAt: new Date().toISOString(),
             likes: 12,
-            dislikes: 3
+            dislikes: 3,
+            verified: true
         },
         {
             id: '1002',
@@ -917,7 +929,8 @@
             owner: 'mike@example.com',
             createdAt: new Date().toISOString(),
             likes: 8,
-            dislikes: 1
+            dislikes: 1,
+            verified: false
         },
         {
             id: '1003',
@@ -931,7 +944,8 @@
             owner: 'aisha@example.com',
             createdAt: new Date().toISOString(),
             likes: 15,
-            dislikes: 2
+            dislikes: 2,
+            verified: true
         }
     ];
 
@@ -964,9 +978,9 @@
             const showUserProfilesModal = ref(false);
             const viewingUserEmail = ref('');
 
-            // Secret Code
+            // Secret Code - now per-user verified flag
             const secretCodeInput = ref('');
-            const isVerified = ref(false);
+            const globalVerified = ref(false);
             const codeMessageText = ref('🔑 Enter the secret code to get verified');
             const codeMessageClass = ref('info');
 
@@ -1036,7 +1050,7 @@
                 showUserProfilesModal.value = true;
             }
 
-            // Permissions - allow multiple portfolios
+            // Permissions
             const canEdit = (profile) => {
                 if (isDev.value) return true;
                 if (!currentUser.value) return false;
@@ -1107,7 +1121,7 @@
                 showToast('✅ Data exported successfully!', 'success');
             }
 
-            // Secret Code Verification
+            // Secret Code Verification - sets verified flag on the user account
             function verifyCode() {
                 const entered = secretCodeInput.value.trim();
 
@@ -1118,32 +1132,48 @@
                 }
 
                 if (entered === SECRET_CODE) {
-                    isVerified.value = true;
+                    if (!currentUser.value) {
+                        showToast('Please login first to verify your account', 'error');
+                        return;
+                    }
+                    
+                    // Mark this user as verified in localStorage
+                    const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                    if (users[currentUser.value.email]) {
+                        users[currentUser.value.email].verified = true;
+                        localStorage.setItem('portfolio_users', JSON.stringify(users));
+                    }
+                    
+                    globalVerified.value = true;
                     codeMessageClass.value = 'success';
-                    codeMessageText.value = '✅ Verified! Your badge has been unlocked. 🎉';
-                    localStorage.setItem('verified', 'true');
-                    localStorage.setItem('codeUsed', entered);
-                    showToast('✅ Verified badge unlocked! 🎉', 'success');
+                    codeMessageText.value = '✅ Verified! Your account is now verified. New portfolios will have the badge. 🎉';
+                    localStorage.setItem('verified_' + currentUser.value.email, 'true');
+                    showToast('✅ Account verified! Your next portfolio will have the badge.', 'success');
                 } else {
-                    isVerified.value = false;
+                    globalVerified.value = false;
                     codeMessageClass.value = 'error';
                     codeMessageText.value = '❌ Invalid code. Try again.';
-                    localStorage.removeItem('verified');
-                    localStorage.removeItem('codeUsed');
                     showToast('❌ Invalid secret code', 'error');
                 }
             }
 
-            // Load saved verification
+            // Load saved verification for the current user
             function loadSavedVerification() {
-                const saved = localStorage.getItem('verified');
-                const savedCode = localStorage.getItem('codeUsed');
-
-                if (saved === 'true' && savedCode === SECRET_CODE) {
-                    isVerified.value = true;
-                    secretCodeInput.value = savedCode;
-                    codeMessageClass.value = 'success';
-                    codeMessageText.value = '✅ Previously verified! Badge restored. 🎉';
+                if (currentUser.value) {
+                    const saved = localStorage.getItem('verified_' + currentUser.value.email);
+                    if (saved === 'true') {
+                        globalVerified.value = true;
+                        secretCodeInput.value = SECRET_CODE;
+                        codeMessageClass.value = 'success';
+                        codeMessageText.value = '✅ Verified! Your account is verified. 🎉';
+                    } else {
+                        // Check if user was already verified in the users object
+                        const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                        if (users[currentUser.value.email] && users[currentUser.value.email].verified) {
+                            globalVerified.value = true;
+                            localStorage.setItem('verified_' + currentUser.value.email, 'true');
+                        }
+                    }
                 }
             }
 
@@ -1266,7 +1296,7 @@
                 selectedProfile.value = profile;
             }
 
-            // Add Profile - now allows multiple portfolios
+            // Add Profile - now with verified flag if user is verified
             async function addProfile() {
                 if (!currentUser.value) {
                     showToast('Please login first', 'error');
@@ -1278,7 +1308,6 @@
                     return;
                 }
 
-                // No longer checking for existing profile - allowing multiple
                 const newProfile = {
                     id: Date.now().toString().slice(-6) + Math.random().toString(36).slice(2, 4),
                     name: form.value.name.trim(),
@@ -1291,14 +1320,15 @@
                     owner: currentUser.value.email,
                     createdAt: new Date().toISOString(),
                     likes: 0,
-                    dislikes: 0
+                    dislikes: 0,
+                    verified: globalVerified.value // Only verified if user has unlocked it
                 };
 
                 profiles.value.unshift(newProfile);
                 await saveData();
                 
                 form.value = { name: '', title: '', bio: '', email: '', whatsapp: '', instagram: '', avatar: '🚀' };
-                showToast(`✅ New portfolio "${newProfile.name}" published! 🎉`, 'success');
+                showToast(`✅ New portfolio "${newProfile.name}" published!${newProfile.verified ? ' (Verified)' : ''} 🎉`, 'success');
             }
 
             // Delete Profile
@@ -1340,6 +1370,14 @@
                 
                 const newAvatar = prompt('Choose avatar (emoji):', profile.avatar);
                 if (newAvatar && newAvatar.length <= 2) profile.avatar = newAvatar;
+                
+                // Allow toggling verified status (dev only or owner can't change)
+                if (isDev.value) {
+                    const toggleVerified = confirm('Toggle verified status? Current: ' + (profile.verified ? 'Verified' : 'Not verified'));
+                    if (toggleVerified) {
+                        profile.verified = !profile.verified;
+                    }
+                }
                 
                 saveData();
                 showToast('✅ Profile updated!', 'success');
@@ -1420,6 +1458,32 @@
                 }
             }
 
+            // Persistent Login
+            function saveSession() {
+                if (currentUser.value) {
+                    localStorage.setItem('portfolio_session', JSON.stringify({
+                        email: currentUser.value.email,
+                        name: currentUser.value.name
+                    }));
+                } else {
+                    localStorage.removeItem('portfolio_session');
+                }
+            }
+
+            function loadSession() {
+                const session = localStorage.getItem('portfolio_session');
+                if (session) {
+                    try {
+                        const data = JSON.parse(session);
+                        if (data.email && data.name) {
+                            currentUser.value = { email: data.email, name: data.name };
+                            return true;
+                        }
+                    } catch (e) {}
+                }
+                return false;
+            }
+
             // Auth
             async function loginUser() {
                 if (!loginEmail.value || !loginPassword.value) {
@@ -1436,7 +1500,8 @@
                     }
                     users[loginEmail.value] = { 
                         password: loginPassword.value, 
-                        name: loginEmail.value.split('@')[0] 
+                        name: loginEmail.value.split('@')[0],
+                        verified: false
                     };
                     localStorage.setItem('portfolio_users', JSON.stringify(users));
                     showToast('✅ Account created! Please login.', 'success');
@@ -1453,7 +1518,16 @@
                     email: loginEmail.value,
                     name: users[loginEmail.value].name || loginEmail.value.split('@')[0]
                 };
-                
+                saveSession();
+
+                // Check if user is verified
+                if (users[loginEmail.value].verified) {
+                    globalVerified.value = true;
+                    localStorage.setItem('verified_' + loginEmail.value, 'true');
+                } else {
+                    globalVerified.value = false;
+                }
+
                 showLogin.value = false;
                 loginEmail.value = '';
                 loginPassword.value = '';
@@ -1464,6 +1538,8 @@
                 currentUser.value = null;
                 isDev.value = false;
                 showDevDashboard.value = false;
+                globalVerified.value = false;
+                localStorage.removeItem('portfolio_session');
                 showToast('👋 Logged out successfully', 'info');
             }
 
@@ -1488,8 +1564,13 @@
             // Auto-refresh
             let refreshInterval = null;
 
-            onMounted(() => {
-                loadData();
+            onMounted(async () => {
+                await loadData();
+                const sessionRestored = loadSession();
+                if (sessionRestored) {
+                    loadSavedVerification();
+                    showToast(`👋 Welcome back ${currentUser.value.name}!`, 'success');
+                }
                 loadSavedVerification();
                 refreshInterval = setInterval(() => {
                     if (selectedProfile.value) {
@@ -1536,7 +1617,7 @@
                 logout,
                 activateDevMode,
                 secretCodeInput,
-                isVerified,
+                globalVerified,
                 codeMessageText,
                 codeMessageClass,
                 verifyCode,
