@@ -78,6 +78,12 @@
         .banned-owner-badge { background: #ef4444; color: white; padding: 2px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; display:inline-flex; align-items:center; gap:4px; }
         .like-sparkle { animation: likePop 0.4s ease-out; }
         .banned-text { color: #ef4444; text-decoration: line-through; }
+        .verify-toggle-btn { background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 12px 24px; border-radius: 14px; border: none; font-weight: 600; font-size: 15px; cursor: pointer; transition: all 0.3s; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .verify-toggle-btn:hover { transform: scale(1.02); box-shadow: 0 8px 30px rgba(99,102,241,0.3); }
+        .verify-toggle-btn.active { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .verify-toggle-btn.active:hover { box-shadow: 0 8px 30px rgba(239,68,68,0.3); }
+        .verify-card { transition: all 0.4s cubic-bezier(0.4,0,0.2,1); overflow: hidden; max-height: 0; opacity: 0; }
+        .verify-card.open { max-height: 400px; opacity: 1; margin-top: 16px; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen">
@@ -537,28 +543,37 @@
             <!-- RIGHT COLUMN -->
             <div class="lg:col-span-4 space-y-6">
                 
-                <!-- Secret Code Section -->
-                <div class="secret-section">
-                    <div class="text-sm font-semibold text-white mb-1">🔑 Unlock Verified Badge</div>
-                    <p class="text-xs text-slate-400 mb-3">Enter the secret code to get a verified badge on your portfolio</p>
-                    <div class="code-input-row">
-                        <input 
-                            type="text" 
-                            v-model="secretCodeInput"
-                            placeholder="Enter secret code" 
-                            maxlength="20"
-                            @keyup.enter="verifyCode"
-                        />
-                        <button @click="verifyCode">Verify</button>
-                    </div>
-                    <div class="code-message" :class="codeMessageClass">
-                        {{ codeMessageText }}
-                    </div>
-                    <div v-if="globalVerified && currentUser" class="mt-3 text-xs text-green-400">
-                        ✅ Your account is verified! New portfolios will have the badge.
-                    </div>
-                    <div class="mt-3 text-xs text-amber-400">
-                        ⭐ Portfolios with 50+ likes are automatically verified!
+                <!-- Verify Account Section with Toggle Button -->
+                <div class="glass-card rounded-3xl shadow-xl p-6 border border-white/30">
+                    <button @click="showVerifyCard = !showVerifyCard" class="verify-toggle-btn" :class="showVerifyCard ? 'active' : ''">
+                        <i class="fas" :class="showVerifyCard ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                        {{ showVerifyCard ? 'Close Verification' : '🔑 Verify Your Account' }}
+                        <span v-if="globalVerified" class="text-xs bg-green-500/30 px-2 py-0.5 rounded-full">✅ Verified</span>
+                    </button>
+                    
+                    <div class="verify-card" :class="showVerifyCard ? 'open' : ''">
+                        <div class="secret-section">
+                            <p class="text-xs text-slate-400 mb-3">Enter the secret code to get a verified badge on your portfolio</p>
+                            <div class="code-input-row">
+                                <input 
+                                    type="text" 
+                                    v-model="secretCodeInput"
+                                    placeholder="Enter secret code" 
+                                    maxlength="20"
+                                    @keyup.enter="verifyCode"
+                                />
+                                <button @click="verifyCode">Verify</button>
+                            </div>
+                            <div class="code-message" :class="codeMessageClass">
+                                {{ codeMessageText }}
+                            </div>
+                            <div v-if="globalVerified && currentUser" class="mt-3 text-xs text-green-400">
+                                ✅ Your account is verified! New portfolios will have the badge.
+                            </div>
+                            <div class="mt-3 text-xs text-amber-400">
+                                ⭐ Portfolios with 50+ likes are automatically verified!
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1029,7 +1044,7 @@
             <div class="flex items-center gap-2">
                 <span class="text-xl">🌟</span>
                 <span class="font-bold gradient-text">PortfoliOasis</span>
-                <span class="text-xs text-slate-400">© 2026</span>
+                <span class="text-xs text-slate-400">© 2024</span>
             </div>
             <div class="flex gap-6 text-sm text-slate-400">
                 <a href="#" class="hover:text-indigo-600 transition-colors"><i class="fab fa-github mr-1"></i>GitHub</a>
@@ -1102,11 +1117,12 @@
             // Banned Users Cache
             const bannedUsers = ref({});
 
-            // Secret Code
+            // Secret Code - with toggle
             const secretCodeInput = ref('');
             const globalVerified = ref(false);
             const codeMessageText = ref('🔑 Enter the secret code to get verified');
             const codeMessageClass = ref('info');
+            const showVerifyCard = ref(false);
 
             // Toast
             const toast = ref({
@@ -2061,6 +2077,7 @@
                 codeMessageText,
                 codeMessageClass,
                 verifyCode,
+                showVerifyCard,
                 getAllUsers,
                 copyPassword,
                 deleteUserAccount,
