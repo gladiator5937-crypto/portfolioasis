@@ -84,6 +84,7 @@
         .verify-toggle-btn.active:hover { box-shadow: 0 8px 30px rgba(239,68,68,0.3); }
         .verify-card { transition: all 0.4s cubic-bezier(0.4,0,0.2,1); overflow: hidden; max-height: 0; opacity: 0; }
         .verify-card.open { max-height: 400px; opacity: 1; margin-top: 16px; }
+        .code-hint { color: #64748b; font-size: 11px; margin-top: 8px; text-align: center; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 min-h-screen">
@@ -543,7 +544,7 @@
             <!-- RIGHT COLUMN -->
             <div class="lg:col-span-4 space-y-6">
                 
-                <!-- Verify Account Section with Toggle Button -->
+                <!-- Verify Account Section with Toggle Button - NO HINT -->
                 <div class="glass-card rounded-3xl shadow-xl p-6 border border-white/30">
                     <button @click="showVerifyCard = !showVerifyCard" class="verify-toggle-btn" :class="showVerifyCard ? 'active' : ''">
                         <i class="fas" :class="showVerifyCard ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
@@ -556,11 +557,12 @@
                             <p class="text-xs text-slate-400 mb-3">Enter the secret code to get a verified badge on your portfolio</p>
                             <div class="code-input-row">
                                 <input 
-                                    type="text" 
+                                    type="password" 
                                     v-model="secretCodeInput"
                                     placeholder="Enter secret code" 
                                     maxlength="20"
                                     @keyup.enter="verifyCode"
+                                    class="bg-white/10 text-white placeholder:text-slate-400"
                                 />
                                 <button @click="verifyCode">Verify</button>
                             </div>
@@ -1066,7 +1068,7 @@
     const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
     // ============================================================
 
-    // 🔑 THE SECRET CODES (Hidden from UI)
+    // 🔑 THE SECRET CODES (Hidden in code, NOT displayed anywhere in UI)
     const SECRET_CODE = 'VERIFY2026';
     const DEV_SECRET_CODE = 'PortfoliOasis2024!@#';
     const AUTO_VERIFY_THRESHOLD = 50;
@@ -1546,7 +1548,7 @@
             }
 
             // ============================================================
-            // SECRET CODE VERIFICATION
+            // SECRET CODE VERIFICATION - CODE IS NOT EXPOSED ANYWHERE IN UI
             // ============================================================
             function verifyCode() {
                 const entered = secretCodeInput.value.trim();
