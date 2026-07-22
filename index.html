@@ -797,49 +797,56 @@
                                     <span class="text-xs text-slate-400">{{ getPrivateMessages(selectedProfile.id).length }} messages</span>
                                 </div>
                                 
-                                <div class="bg-slate-50 rounded-2xl p-4 h-52 overflow-y-auto space-y-2 scrollbar-hide">
-                                    <div v-if="getPrivateMessages(selectedProfile.id).length === 0" class="text-center py-8">
-                                        <div class="text-3xl mb-2">💬</div>
-                                        <p class="text-xs text-slate-400">No messages yet. Start a private conversation!</p>
-                                    </div>
-                                    <div v-for="msg in getPrivateMessages(selectedProfile.id)" :key="msg.timestamp" 
-                                         class="chat-message bg-white rounded-xl p-3 shadow-sm border border-slate-100 animate-slide-in">
-                                        <div class="flex justify-between items-start">
-                                            <div class="flex items-center gap-2">
-                                                <span :class="msg.sender === selectedProfile.name ? 'text-green-600' : 'text-indigo-600'">
-                                                    <i class="fas fa-user-circle mr-1"></i>{{ msg.sender || 'Anonymous' }}
-                                                </span>
-                                                <span class="text-xs text-slate-400 font-normal">{{ msg.time }}</span>
-                                            </div>
-                                            <button v-if="canDeleteMessage(msg)" 
-                                                    @click="deleteMessage(msg)" 
-                                                    class="text-red-400 hover:text-red-600 text-xs transition-colors ml-2">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                        <p class="text-sm text-slate-700 mt-1">{{ msg.text }}</p>
-                                    </div>
+                                <!-- Login required for chat -->
+                                <div v-if="!currentUser" class="text-center py-6 bg-slate-50 rounded-2xl">
+                                    <div class="text-3xl mb-2">🔒</div>
+                                    <p class="text-xs text-slate-400 mb-3">Please login to chat</p>
+                                    <button @click="showLogin = true" 
+                                            class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl text-sm font-medium hover:shadow-lg transition-all">
+                                        <i class="fas fa-sign-in-alt mr-2"></i>Login to Chat
+                                    </button>
                                 </div>
 
-                                <div class="mt-3">
-                                    <input 
-                                        type="text" 
-                                        v-model="visitorName"
-                                        placeholder="Your name..."
-                                        class="w-full p-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none mb-2"
-                                    />
-                                    <div class="flex gap-2">
-                                        <input 
-                                            type="text" 
-                                            v-model="chatInput"
-                                            @keyup.enter="sendMessage(selectedProfile.id)"
-                                            placeholder="Type a message..."
-                                            class="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
-                                        />
-                                        <button @click="sendMessage(selectedProfile.id)"
-                                                class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all">
-                                            <i class="fas fa-paper-plane"></i>
-                                        </button>
+                                <!-- Chat for logged in users -->
+                                <div v-else>
+                                    <div class="bg-slate-50 rounded-2xl p-4 h-52 overflow-y-auto space-y-2 scrollbar-hide">
+                                        <div v-if="getPrivateMessages(selectedProfile.id).length === 0" class="text-center py-8">
+                                            <div class="text-3xl mb-2">💬</div>
+                                            <p class="text-xs text-slate-400">No messages yet. Start a private conversation!</p>
+                                        </div>
+                                        <div v-for="msg in getPrivateMessages(selectedProfile.id)" :key="msg.timestamp" 
+                                             class="chat-message bg-white rounded-xl p-3 shadow-sm border border-slate-100 animate-slide-in">
+                                            <div class="flex justify-between items-start">
+                                                <div class="flex items-center gap-2">
+                                                    <span :class="msg.senderEmail === selectedProfile.owner ? 'text-green-600' : 'text-indigo-600'">
+                                                        <i class="fas fa-user-circle mr-1"></i>{{ msg.sender }}
+                                                    </span>
+                                                    <span class="text-xs text-slate-400 font-normal">{{ msg.time }}</span>
+                                                </div>
+                                                <button v-if="canDeleteMessage(msg)" 
+                                                        @click="deleteMessage(msg)" 
+                                                        class="text-red-400 hover:text-red-600 text-xs transition-colors ml-2">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                            <p class="text-sm text-slate-700 mt-1">{{ msg.text }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-3">
+                                        <div class="flex gap-2">
+                                            <input 
+                                                type="text" 
+                                                v-model="chatInput"
+                                                @keyup.enter="sendMessage(selectedProfile.id)"
+                                                placeholder="Type a message..."
+                                                class="flex-1 p-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                                            />
+                                            <button @click="sendMessage(selectedProfile.id)"
+                                                    class="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1929,39 +1936,24 @@
                 if (isDev.value) {
                     return messages.value.filter(m => m.profileId === profileId);
                 }
-                return messages.value.filter(m => 
-                    m.profileId === profileId && 
-                    (m.visibleTo === 'all' || 
-                     (currentUser.value && m.visibleTo === currentUser.value.email) ||
-                     (selectedProfile.value && m.visibleTo === selectedProfile.value.owner) ||
-                     (currentUser.value && m.senderEmail === currentUser.value.email))
-                );
-            }
-
-            function getMessages(profileId) {
-                if (isDev.value) {
-                    return messages.value.filter(m => m.profileId === profileId);
-                }
+                if (!currentUser.value) return [];
                 const profile = profiles.value.find(p => p.id === profileId);
                 if (!profile) return [];
                 
                 return messages.value.filter(m => {
                     if (m.profileId !== profileId) return false;
-                    if (isDev.value) return true;
-                    if (currentUser.value && m.conversationId) {
+                    if (m.conversationId) {
                         const conv = getConversation(m.conversationId);
                         if (conv && (conv.participant1 === currentUser.value.email || conv.participant2 === currentUser.value.email)) {
                             return true;
                         }
                     }
-                    if (currentUser.value && profile.owner === currentUser.value.email && m.conversationId) {
-                        const conv = getConversation(m.conversationId);
-                        if (conv && (conv.participant1 === profile.owner || conv.participant2 === profile.owner)) {
-                            return true;
-                        }
-                    }
                     return false;
                 });
+            }
+
+            function getMessages(profileId) {
+                return getPrivateMessages(profileId);
             }
 
             function getConversation(conversationId) {
@@ -2026,7 +2018,7 @@
                     text: filterProfanity(chatInput.value.trim()),
                     time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     timestamp: now.getTime(),
-                    sender: currentUser.value.name || 'Anonymous',
+                    sender: currentUser.value.email,
                     senderEmail: currentUser.value.email
                 };
                 
