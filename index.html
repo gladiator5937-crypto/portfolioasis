@@ -685,7 +685,7 @@
                                 <p class="text-sm text-slate-600 leading-relaxed">{{ selectedProfile.bio }}</p>
                             </div>
 
-                            <div v-if="selectedProfile.email || selectedProfile.whatsapp || selectedProfile.instagram" class="border-t pt-4">
+                            <div v-if="selectedProfile.email || selectedProfile.whatsapp || selectedProfile.instagram || selectedProfile.linkedin" class="border-t pt-4">
                                 <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
                                     <i class="fas fa-address-card mr-2"></i>Contact
                                 </h4>
@@ -701,6 +701,10 @@
                                     <a v-if="selectedProfile.instagram" :href="'https://instagram.com/' + selectedProfile.instagram" target="_blank"
                                        class="px-3 py-2 bg-pink-50 hover:bg-pink-100 text-pink-700 rounded-xl text-sm transition-colors">
                                         <i class="fab fa-instagram mr-1"></i>Instagram
+                                    </a>
+                                    <a v-if="selectedProfile.linkedin" :href="'https://linkedin.com/in/' + selectedProfile.linkedin" target="_blank"
+                                       class="px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-sm transition-colors">
+                                        <i class="fab fa-linkedin mr-1"></i>LinkedIn
                                     </a>
                                 </div>
                             </div>
@@ -784,21 +788,21 @@
                                 </button>
                             </div>
 
-                            <!-- Chat -->
+                            <!-- Private Chat -->
                             <div class="border-t pt-4">
                                 <div class="flex justify-between items-center mb-2">
                                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider">
-                                        <i class="fas fa-comments mr-2"></i>Live Chat
+                                        <i class="fas fa-comments mr-2"></i>Private Chat
                                     </h4>
-                                    <span class="text-xs text-slate-400">{{ getMessages(selectedProfile.id).length }} messages</span>
+                                    <span class="text-xs text-slate-400">{{ getPrivateMessages(selectedProfile.id).length }} messages</span>
                                 </div>
                                 
                                 <div class="bg-slate-50 rounded-2xl p-4 h-52 overflow-y-auto space-y-2 scrollbar-hide">
-                                    <div v-if="getMessages(selectedProfile.id).length === 0" class="text-center py-8">
+                                    <div v-if="getPrivateMessages(selectedProfile.id).length === 0" class="text-center py-8">
                                         <div class="text-3xl mb-2">💬</div>
-                                        <p class="text-xs text-slate-400">No messages yet. Start the conversation!</p>
+                                        <p class="text-xs text-slate-400">No messages yet. Start a private conversation!</p>
                                     </div>
-                                    <div v-for="msg in getMessages(selectedProfile.id)" :key="msg.timestamp" 
+                                    <div v-for="msg in getPrivateMessages(selectedProfile.id)" :key="msg.timestamp" 
                                          class="chat-message bg-white rounded-xl p-3 shadow-sm border border-slate-100 animate-slide-in">
                                         <div class="flex justify-between items-start">
                                             <div class="flex items-center gap-2">
@@ -986,6 +990,16 @@
                                         v-model="form.instagram"
                                         class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
                                         placeholder="Instagram"
+                                        :disabled="!currentUser"
+                                    />
+                                </div>
+                                <div class="relative">
+                                    <i class="fab fa-linkedin absolute left-3 top-3 text-slate-400"></i>
+                                    <input 
+                                        type="text" 
+                                        v-model="form.linkedin"
+                                        class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
+                                        placeholder="LinkedIn"
                                         :disabled="!currentUser"
                                     />
                                 </div>
@@ -1214,6 +1228,7 @@
                 email: '', 
                 whatsapp: '', 
                 instagram: '',
+                linkedin: '',
                 avatar: '🚀'
             });
 
@@ -1839,6 +1854,7 @@
                     email: form.value.email || '',
                     whatsapp: form.value.whatsapp || '',
                     instagram: form.value.instagram || '',
+                    linkedin: form.value.linkedin || '',
                     owner: currentUser.value.email,
                     createdAt: new Date().toISOString(),
                     likes: 0,
@@ -1852,7 +1868,7 @@
                 profiles.value.unshift(newProfile);
                 await saveData();
                 
-                form.value = { name: '', title: '', bio: '', email: '', whatsapp: '', instagram: '', avatar: '🚀' };
+                form.value = { name: '', title: '', bio: '', email: '', whatsapp: '', instagram: '', linkedin: '', avatar: '🚀' };
                 showToast(`✅ New portfolio "${newProfile.name}" published!${newProfile.vip ? ' 👑 VIP' : ''} 🎉`, 'success');
             }
 
@@ -1908,21 +1924,110 @@
                 showToast('✅ Profile updated!', 'success');
             }
 
-            // Messages
+            // Messages - PRIVATE CHAT SYSTEM
+            function getPrivateMessages(profileId) {
+                if (isDev.value) {
+                    return messages.value.filter(m => m.profileId === profileId);
+                }
+                return messages.value.filter(m => 
+                    m.profileId === profileId && 
+                    (m.visibleTo === 'all' || 
+                     (currentUser.value && m.visibleTo === currentUser.value.email) ||
+                     (selectedProfile.value && m.visibleTo === selectedProfile.value.owner) ||
+                     (currentUser.value && m.senderEmail === currentUser.value.email))
+                );
+            }
+
             function getMessages(profileId) {
-                return messages.value.filter(m => m.profileId === profileId);
+                if (isDev.value) {
+                    return messages.value.filter(m => m.profileId === profileId);
+                }
+                const profile = profiles.value.find(p => p.id === profileId);
+                if (!profile) return [];
+                
+                return messages.value.filter(m => {
+                    if (m.profileId !== profileId) return false;
+                    if (isDev.value) return true;
+                    if (currentUser.value && m.conversationId) {
+                        const conv = getConversation(m.conversationId);
+                        if (conv && (conv.participant1 === currentUser.value.email || conv.participant2 === currentUser.value.email)) {
+                            return true;
+                        }
+                    }
+                    if (currentUser.value && profile.owner === currentUser.value.email && m.conversationId) {
+                        const conv = getConversation(m.conversationId);
+                        if (conv && (conv.participant1 === profile.owner || conv.participant2 === profile.owner)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+            }
+
+            function getConversation(conversationId) {
+                if (!conversationId) return null;
+                const conversations = JSON.parse(localStorage.getItem('portfolio_conversations') || '{}');
+                return conversations[conversationId] || null;
+            }
+
+            function saveConversation(conversationId, participant1, participant2) {
+                const conversations = JSON.parse(localStorage.getItem('portfolio_conversations') || '{}');
+                if (!conversations[conversationId]) {
+                    conversations[conversationId] = {
+                        id: conversationId,
+                        participant1: participant1,
+                        participant2: participant2,
+                        createdAt: new Date().toISOString()
+                    };
+                    localStorage.setItem('portfolio_conversations', JSON.stringify(conversations));
+                }
+                return conversations[conversationId];
+            }
+
+            function getOrCreateConversationId(profileId) {
+                if (!currentUser.value) return null;
+                const profile = profiles.value.find(p => p.id === profileId);
+                if (!profile) return null;
+                if (currentUser.value.email === profile.owner) return null;
+                
+                const conversations = JSON.parse(localStorage.getItem('portfolio_conversations') || '{}');
+                const existingConvId = Object.keys(conversations).find(cid => {
+                    const conv = conversations[cid];
+                    return (conv.participant1 === currentUser.value.email && conv.participant2 === profile.owner) ||
+                           (conv.participant1 === profile.owner && conv.participant2 === currentUser.value.email);
+                });
+                
+                if (existingConvId) return existingConvId;
+                
+                const newConvId = 'conv_' + Date.now().toString().slice(-6) + Math.random().toString(36).slice(2, 4);
+                saveConversation(newConvId, currentUser.value.email, profile.owner);
+                return newConvId;
             }
 
             async function sendMessage(profileId) {
                 if (!chatInput.value.trim()) return;
+                if (!currentUser.value) {
+                    showToast('Please login to send messages', 'error');
+                    return;
+                }
+                
+                const conversationId = getOrCreateConversationId(profileId);
+                if (!conversationId) {
+                    if (selectedProfile.value && selectedProfile.value.owner === currentUser.value.email) {
+                        showToast('You cannot send messages on your own portfolio', 'error');
+                    }
+                    return;
+                }
                 
                 const now = new Date();
                 const msg = {
                     profileId: profileId,
+                    conversationId: conversationId,
                     text: filterProfanity(chatInput.value.trim()),
                     time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     timestamp: now.getTime(),
-                    sender: visitorName.value.trim() || 'Anonymous'
+                    sender: currentUser.value.name || 'Anonymous',
+                    senderEmail: currentUser.value.email
                 };
                 
                 messages.value.push(msg);
@@ -1933,8 +2038,11 @@
             // Delete Message
             function canDeleteMessage(msg) {
                 if (isDev.value) return true;
+                if (!currentUser.value) return false;
+                if (msg.senderEmail === currentUser.value.email) return true;
                 if (!selectedProfile.value) return false;
-                return selectedProfile.value.owner === currentUser.value?.email;
+                if (selectedProfile.value.owner === currentUser.value.email) return true;
+                return false;
             }
 
             async function deleteMessage(msg) {
@@ -2142,6 +2250,7 @@
                 deleteProfile,
                 editProfile,
                 getMessages,
+                getPrivateMessages,
                 sendMessage,
                 loginUser,
                 logout,
