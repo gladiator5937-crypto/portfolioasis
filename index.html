@@ -1368,6 +1368,83 @@
             }
 
             // ============================================================
+            // BAN / UNBAN FUNCTIONS
+            // ============================================================
+            function banUser(email) {
+                if (!isDev.value) {
+                    showToast('❌ Only developers can ban users', 'error');
+                    return;
+                }
+                banTargetEmail.value = email;
+                banReason.value = '';
+                showBanModal.value = true;
+            }
+
+            function confirmBan() {
+                const email = banTargetEmail.value;
+                if (!email) return;
+                
+                const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                if (users[email]) {
+                    users[email].banned = true;
+                    users[email].banReason = banReason.value || 'Violation of terms';
+                    users[email].banId = 'BAN-' + Date.now().toString().slice(-6);
+                    localStorage.setItem('portfolio_users', JSON.stringify(users));
+                    
+                    bannedUsers.value[email] = true;
+                    
+                    if (currentUser.value && currentUser.value.email === email) {
+                        banData.value = {
+                            show: true,
+                            reason: users[email].banReason,
+                            banId: users[email].banId
+                        };
+                    }
+                    
+                    saveData();
+                    showToast(`🚫 User "${email}" has been banned!`, 'success');
+                }
+                
+                showBanModal.value = false;
+                banTargetEmail.value = '';
+                banReason.value = '';
+            }
+
+            function unbanUser(email) {
+                if (!isDev.value) {
+                    showToast('❌ Only developers can unban users', 'error');
+                    return;
+                }
+                
+                const users = JSON.parse(localStorage.getItem('portfolio_users') || '{}');
+                if (users[email]) {
+                    users[email].banned = false;
+                    users[email].banReason = '';
+                    users[email].banId = '';
+                    localStorage.setItem('portfolio_users', JSON.stringify(users));
+                    
+                    bannedUsers.value[email] = false;
+                    
+                    if (currentUser.value && currentUser.value.email === email) {
+                        banData.value.show = false;
+                    }
+                    
+                    saveData();
+                    showToast(`✅ User "${email}" has been unbanned!`, 'success');
+                }
+            }
+
+            function logoutFromBan() {
+                currentUser.value = null;
+                isDev.value = false;
+                showDevDashboard.value = false;
+                globalVIP.value = false;
+                banData.value.show = false;
+                localStorage.removeItem('portfolio_session');
+                showToast('👋 Logged out successfully', 'info');
+            }
+
+            // ============================================================
             // LIKE / DISLIKE FUNCTIONS
             // ============================================================
             
